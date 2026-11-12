@@ -1,0 +1,14 @@
+MultiSynth JIANT 0.2 - PRUEBA EXPERIMENTAL
+
+Contiene el motor felucca.wasm que has proporcionado, el emulador JIANT y la interfaz táctil modificada.
+
+WINDOWS 11:
+1. Descomprime el ZIP.
+2. Ejecuta INICIAR_WINDOWS.bat (requiere Python instalado).
+3. Abre http://localhost:8790/ en Chrome/Edge.
+4. Pulsa Switch on para activar audio.
+
+PIXEL:
+El navegador Android requiere HTTPS para AudioWorklet, salvo localhost. No basta abrir index.html desde el gestor de archivos ni alojarlo en HTTP de tu PC. Para probarlo en Pixel, publica el CONTENIDO de esta carpeta en un hosting HTTPS (p.ej. Netlify Drop) y abre la URL HTTPS. Si lo publicas, no incluyas datos personales ni presets privados.
+
+ADVERTENCIA: No se ha probado el sonido en hardware real. La compatibilidad del WASM recibido con esta version del HTML/worklet esta pendiente de validacion. No modifica firmware fisico. Se distribuye como adaptacion experimental GPL-3.0.

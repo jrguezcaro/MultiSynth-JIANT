@@ -1,0 +1,1 @@
+MultiSynth JIANT 0.4: una sola pantalla, sin scroll; editor flotante de un encoder a la vez; teclado inferior compacto; modo pantalla completa; motor JIANT original intacto. Requiere pruebas reales en Pixel. GPL-3.0.
