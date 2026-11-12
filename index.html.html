@@ -1,0 +1,1076 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only
+     Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
+     Portions Copyright (C) 2026 Juan Ignacio Antonucci (Juan Jiant)
+     The page follows X0X's browser page, web/emu/index.html of charlesvestal/fm1-x0x (GPL-3.0), a Felucca fork. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MultiSynth JIANT 1.5</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect width=%2216%22 height=%2216%22 rx=%223%22/%3E%3Crect x=%224%22 y=%224%22 width=%228%22 height=%228%22 fill=%22%23fff%22/%3E%3C/svg%3E">
+<meta name="description" content="JIANT FM, live firmware for the M-VAVE FM-1, running in your browser: the same code the instrument runs.">
+<style>
+/* DotGothic16 (SIL OFL 1.1, fonts/OFL.txt), cut to printable ASCII, for the knob labels */
+@font-face { font-family: "DotGothic16"; src: url("fonts/DotGothic16-subset.woff") format("woff"); font-display: swap; }
+:root { --bg: #8e8e93; --fg: #111; --dim: #2c2c2e; --rule: #5a5a5e;
+        --body: #1d1d1f; --tray: #141415; --part: #2a2a2d; --edge: #3a3a3e; --label: #d6d6d8;
+        --lit: #fff4d6; --green: #5fe08a; color-scheme: light; }
+html, body { background: var(--bg); }
+body { margin: 0; color: var(--fg); font: 13px/1.6 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
+main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 32px; }
+@media (orientation: portrait) and (max-width: 700px) { main { padding: 8px 8px 24px; } }
+a { color: inherit; }
+.device { position: relative; width: 100%; aspect-ratio: 1000 / 624; user-select: none; -webkit-user-select: none;
+          -webkit-touch-callout: none; touch-action: manipulation; }
+.device svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.device canvas { position: absolute; image-rendering: crisp-edges; image-rendering: pixelated; background: #000; }
+.hit { position: absolute; touch-action: none; cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: 10px; }
+.hit.knob { cursor: ns-resize; border-radius: 50%; }
+.hit:focus-visible { outline: 2px solid var(--lit); outline-offset: 2px; }
+.face { transition: fill .05s; }
+.dim .face.btn { fill: #3a3934; }
+.lit .face.btn { fill: var(--lit); }
+.lit text { fill: #1d1d1f; }
+.green .face.btn { fill: var(--green); }
+.green text { fill: #0d2414; }
+.face.key { fill: #0c0c0d; stroke: var(--edge); stroke-width: 1.5; }
+.slit { fill: #3a3a3c; transition: fill .05s; }
+.dim .slit { fill: #77777b; }
+.lit .slit { fill: #ececee; filter: drop-shadow(0 0 3px rgba(255, 255, 255, .6)); }
+/* #119: what can be pressed breathes, dark .. ~60 % of lit and back (hal/fm1_input.h fm1_led_breath, ~1.1 s; MENU >
+ * LEDS DIM LO ~30 %): the peaks between dark and lit at ~0.8 / ~0.58 on screen (the LED's share, gamma-encoded) */
+@keyframes breath-btn { 0%, 100% { fill: #3a3934; } 50% { fill: #d8cfb6; } }
+@keyframes breath-slit { 0%, 100% { fill: #3a3a3c; } 50% { fill: #c8c8ca; } }
+@keyframes breath-btn-lo { 0%, 100% { fill: #3a3934; } 50% { fill: #aca592; } }
+@keyframes breath-slit-lo { 0%, 100% { fill: #3a3a3c; } 50% { fill: #a1a1a3; } }
+.breath .face.btn { animation: breath-btn 1.13s ease-in-out infinite; }
+.breath .slit { animation: breath-slit 1.13s ease-in-out infinite; }
+.dimlo .breath .face.btn { animation-name: breath-btn-lo; }
+.dimlo .breath .slit { animation-name: breath-slit-lo; }
+@media (prefers-reduced-motion: reduce) {
+  .breath .face.btn, .breath .slit { animation: none; }
+  .breath .face.btn { fill: #aca592; }
+  .breath .slit { fill: #a1a1a3; }
+}
+/* the DRUM grid's beats (hal/fm1_input.h fm1_led_mid): a steady level between the glow and lit, ~15 % (DIM LO ~10 %) */
+.mid .slit { fill: #9a9a9e; }
+.dimlo .mid .slit { fill: #8a8a8e; }
+.held .face { stroke: var(--lit); stroke-width: 3; }
+.latched .face { stroke: #79b8ff; stroke-width: 3; }
+.start { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px;
+         background: rgba(0, 0, 0, .5); border-radius: 4% / 6%; }
+.start[hidden] { display: none; }
+.start button { font: inherit; font-size: 18px; padding: 12px 28px; background: #fff; color: #000; border: 0; cursor: pointer; }
+.start button:disabled { opacity: .4; cursor: progress; }
+.start p { margin: 0; max-width: 32em; text-align: center; color: #fff; }
+.keys, footer { margin: 16px 0 0; color: var(--dim); text-align: center; }
+.keys span { white-space: nowrap; margin: 0 8px; }
+kbd { font: 600 11px ui-monospace, Menlo, monospace; border: 1px solid var(--rule); padding: 0 4px; color: var(--fg); }
+footer { margin-top: 12px; font-size: 12px; }
+footer nav a { margin: 0 6px; }
+footer small { font-size: 11px; opacity: .8; }
+
+/* MultiSynth touch extension: original JIANT panel and synthesis remain unchanged. */
+.ms-bar { position:sticky;top:0;z-index:20;background:#17191e;color:#f2f3f5;padding:10px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px; }
+.ms-bar button,.ms-edit button {background:#303740;color:white;border:1px solid #58636f;border-radius:10px;min-height:42px;padding:8px 14px;font:inherit;touch-action:manipulation}
+.ms-bar button[aria-pressed=true]{background:#246c59;border-color:#76d7b6}
+.ms-edit{max-width:1040px;margin:8px auto;padding:14px;background:#1d222a;color:white;border-radius:16px;box-sizing:border-box;display:none;gap:12px}
+.ms-edit.open{display:grid}.ms-edit label{font-size:13px;color:#d5e3eb}.ms-edit input[type=range]{width:100%;height:40px;accent-color:#82dcb9;touch-action:pan-x}
+.ms-edit .ms-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.ms-edit .ms-control{background:#2b333d;padding:12px;border-radius:12px}
+.ms-edit .ms-control strong{font-size:13px}.ms-edit .ms-control small{color:#b4c2ce}
+.ms-edit .ms-steps{display:flex;align-items:center;justify-content:space-between;gap:8px}.ms-edit .ms-steps button{min-width:50px}
+@media(max-width:620px){.ms-edit .ms-controls{grid-template-columns:1fr}.ms-bar{position:relative} main{padding-top:6px}}
+
+/* MultiSynth 0.3: touch-first performance controls, original JIANT drawing retained. */
+.ms-bar{position:relative;gap:7px}.ms-bar button{min-height:46px}
+.ms-edit.open{display:block}.ms-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ms-control{background:#29323c;border-radius:12px;padding:10px;min-width:0}
+.ms-control strong{display:block;margin-bottom:5px}
+.ms-steps{display:flex;gap:7px;align-items:center}
+.ms-steps button{flex:0 0 46px;min-width:46px;height:52px;font-size:22px}
+.ms-swipe{flex:1;min-width:0;height:52px;background:#3a4b55;border:1px solid #64837d;border-radius:10px;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;color:#d2f4e6;font-size:12px;text-align:center}
+.ms-swipe.active{background:#255e52}
+.ms-performance{background:#151b22;color:#f0f5f4;max-width:1040px;margin:8px auto 0;padding:10px;box-sizing:border-box;border-radius:15px}
+.ms-performance-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.ms-performance button{background:#34414d;color:#fff;border:1px solid #6b7d8b;border-radius:9px;min-height:44px;padding:6px 12px;font:inherit}
+.ms-piano{height:138px;position:relative;display:flex;touch-action:none;user-select:none;overflow:hidden;border-radius:8px;background:#111}
+.ms-white{flex:1;background:#f5f5f1;border:1px solid #777;border-radius:0 0 5px 5px;position:relative;touch-action:none}
+.ms-white.pressed{background:#81d6b6}
+.ms-black{position:absolute;top:0;height:60%;width:4.3%;background:#161d27;border:1px solid #555;border-radius:0 0 4px 4px;z-index:2;touch-action:none}
+.ms-black.pressed{background:#2d987a}
+.ms-performance[hidden]{display:none}
+@media(max-width:700px){main{padding:4px 5px 12px}.ms-bar{padding:6px}.ms-edit{margin:4px 5px;padding:8px}.ms-performance{margin:5px;padding:7px}.ms-piano{height:clamp(112px,27vh,170px)}.keys{display:none}}
+@media(max-width:700px) and (orientation:landscape){.device{max-height:46vh;width:auto;margin:auto}.ms-piano{height:28vh}.ms-controls{grid-template-columns:repeat(4,minmax(0,1fr))}.ms-control{padding:6px}.ms-steps button{min-width:35px;flex-basis:35px}}
+
+/* v0.4: single-viewport instrument; editing overlays instead of adding page height. */
+html,body{height:100%;height:100dvh;overflow:hidden;overscroll-behavior:none}
+body{display:grid;grid-template-rows:auto minmax(0,1fr);background:#111820}
+.ms-bar{grid-row:1;min-height:0;position:relative;z-index:50;flex-wrap:nowrap;padding:5px 10px;gap:6px;box-sizing:border-box}
+.ms-bar strong{margin-right:auto;white-space:nowrap;font-size:12px}
+.ms-bar button{min-height:34px;padding:4px 9px;white-space:nowrap;font-size:12px}
+main{grid-row:2;grid-column:1;min-height:0;min-width:0;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:4px!important;box-sizing:border-box;width:100%;max-width:none}
+.device{width:min(100%,calc((100dvh - 56px)*1.60256));max-height:100%;margin:auto;flex-shrink:0}
+.ms-performance{position:fixed;z-index:35;left:5px;right:5px;bottom:max(5px,env(safe-area-inset-bottom));margin:0;max-width:none;padding:5px 8px;border:1px solid #344452;border-radius:12px}
+.ms-performance-head{margin-bottom:3px;gap:5px}
+.ms-performance-head strong{font-size:10px;letter-spacing:.06em}
+.ms-performance button{min-height:30px;padding:3px 9px;font-size:11px}
+.ms-piano{height:clamp(75px,20dvh,145px)}
+body:has(.ms-performance:not([hidden])) main{padding-bottom:clamp(118px,29dvh,190px)!important}
+body:has(.ms-performance:not([hidden])) .device{width:min(100%,calc((71dvh - 65px)*1.60256))}
+.ms-edit{position:fixed;z-index:60;bottom:max(6px,env(safe-area-inset-bottom));left:8px;right:8px;max-width:480px;margin:0 auto;padding:12px;box-shadow:0 10px 40px #000a;border:1px solid #557266}
+.ms-edit.open{display:block}
+.ms-edit-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ms-edit-head strong{font-size:12px;white-space:nowrap}
+.ms-edit-head select{flex:1;min-width:0;background:#33434d;color:white;border:1px solid #7a8d98;border-radius:8px;min-height:40px;font:inherit}
+.ms-edit-head button{min-height:38px}
+.ms-controls,.ms-edit .ms-controls{display:block}
+.ms-control,.ms-edit .ms-control{padding:8px}
+.ms-control[hidden]{display:none!important}
+.ms-control strong{display:none}
+.ms-edit small{display:block;font-size:10px;margin-top:5px;color:#aabfc3}
+.keys,.kofi,footer{display:none!important}
+@media(max-width:700px){
+ .ms-bar{padding:4px 5px}
+ .ms-bar strong{font-size:11px}
+ .ms-bar button{padding:3px 6px;font-size:11px}
+ .ms-piano{height:clamp(76px,23dvh,125px)}
+ .ms-performance-head strong{display:none}
+}
+@media(orientation:portrait) and (max-width:700px){
+ body:has(.ms-performance:not([hidden])) .device{width:100%;max-height:calc(100dvh - 190px)}
+ body:not(:has(.ms-performance:not([hidden]))) .device{width:100%}
+}
+@media(orientation:landscape) and (max-height:500px){
+ .ms-piano{height:clamp(55px,22dvh,95px)}
+ body:has(.ms-performance:not([hidden])) main{padding-bottom:clamp(93px,33dvh,130px)!important}
+ body:has(.ms-performance:not([hidden])) .device{width:min(100%,calc((64dvh - 43px)*1.60256))}
+ .ms-edit{bottom:5px;max-width:420px}
+}
+
+
+/* MultiSynth 1.1: two coherent, scroll-free modes. */
+html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#10171e;color:#eef3f4}
+body{display:grid;grid-template-rows:46px minmax(0,1fr) auto;gap:0}
+.v1-header{grid-row:1;display:flex;align-items:center;justify-content:space-between;padding:4px 10px;background:#161e28;color:#e9f0f3;z-index:70;min-width:0}
+.v1-brand{display:flex;align-items:baseline;gap:8px;white-space:nowrap}
+.v1-brand b{font-size:17px;letter-spacing:.12em}
+.v1-brand span{font-size:10px;color:#96a8b6}
+.v1-actions{display:flex;gap:5px}
+.v1-actions button,.v1-stage button,.ms-performance button{border:1px solid #475969;background:#273443;color:#e9f4f4;border-radius:9px;font-family:inherit;font-size:12px;font-weight:600;min-height:34px;padding:5px 10px;touch-action:manipulation}
+.v1-actions button:active,.v1-stage button:active,.ms-performance button:active{background:#35725e}
+.v1-stage{grid-row:2;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,1.2fr);align-items:center;gap:10px;padding:8px;box-sizing:border-box}
+.v1-screenbox{position:relative;justify-self:center;min-height:0;height:min(100%,calc(100dvh - 230px));aspect-ratio:1;max-width:100%;border:5px solid #303b47;border-radius:16px;background:black;overflow:hidden;box-sizing:border-box}
+#v1-screen{width:100%;height:100%;image-rendering:pixelated;display:block}
+.v1-overlay{position:absolute;inset:0;display:grid;place-items:center;background:#071018e0;color:white;text-align:center;padding:15px;font-size:13px;cursor:pointer}
+.v1-overlay[hidden]{display:none}
+.v1-controls{min-width:0;display:flex;flex-direction:column;gap:9px;justify-content:center}
+.v1-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.v1-tabs button{padding:6px 2px;min-width:0;font-size:11px}
+.v1-tabs button.active{background:#2d745f;border-color:#8ad4b8;color:white}
+.v1-adjust{display:grid;grid-template-columns:49px minmax(0,1fr) 49px;gap:6px;align-items:stretch}
+.v1-adjust>button{font-size:25px;min-height:66px}
+.v1-swipe{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:#283d45;border:1px solid #6a9689;border-radius:10px;touch-action:none;user-select:none}
+.v1-swipe span{font-weight:700;font-size:15px}
+.v1-swipe small{font-size:9px;letter-spacing:.04em;color:#a8d6c6}
+.v1-shortcuts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.v1-shortcuts button{min-width:0;padding:5px 1px;font-size:10px}
+.ms-performance{position:relative;grid-row:3;z-index:60;left:auto;right:auto;bottom:auto;width:100%;max-width:none;margin:0;border-radius:0;background:#151f29;padding:5px 8px max(5px,env(safe-area-inset-bottom));box-sizing:border-box}
+.ms-performance-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.ms-performance-head>div{display:flex;gap:4px}
+.ms-performance-head button{min-height:28px;padding:3px 9px}
+.ms-piano{height:clamp(80px,20dvh,142px);width:100%;border-radius:7px}
+.ms-performance[hidden]{display:none}
+body.v1-no-piano{grid-template-rows:46px minmax(0,1fr) 0px}
+body.v1-no-piano .v1-screenbox{height:min(100%,calc(100dvh - 70px))}
+body.v1-panel{grid-template-rows:46px minmax(0,1fr) auto}
+body.v1-panel .v1-stage{display:none}
+body.v1-panel main{display:flex!important;grid-row:2;min-height:0;min-width:0;max-width:none;padding:5px!important;align-items:center;justify-content:center;overflow:hidden}
+body.v1-panel .device{max-height:100%;width:min(100%,calc((100dvh - 220px)*1.60256));aspect-ratio:1000/624;margin:auto}
+body.v1-panel.v1-no-piano .device{width:min(100%,calc((100dvh - 65px)*1.60256))}
+main{display:none!important}
+.keys,footer{display:none!important}
+button:focus-visible,.v1-swipe:focus-visible{outline:2px solid #9fe6c9;outline-offset:2px}
+@media (orientation:portrait){
+ .v1-stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;gap:5px;padding:5px}
+ .v1-screenbox{height:min(100%,calc(100dvh - 365px));max-width:100%}
+ .v1-controls{gap:5px}
+ .v1-tabs button{min-height:35px}
+ .v1-adjust>button{min-height:56px}
+ .v1-shortcuts button{min-height:31px}
+ .ms-piano{height:clamp(85px,18dvh,140px)}
+ body.v1-no-piano .v1-screenbox{height:min(100%,calc(100dvh - 210px))}
+ body.v1-panel .device{width:min(100%,calc((100dvh - 220px)*.5607));aspect-ratio:600/1070}
+ body.v1-panel.v1-no-piano .device{width:min(100%,calc((100dvh - 65px)*.5607))}
+}
+@media (orientation:landscape) and (max-height:530px){
+ body{grid-template-rows:36px minmax(0,1fr) auto}
+ .v1-header{padding:2px 7px}
+ .v1-brand b{font-size:13px}
+ .v1-actions button{min-height:29px;padding:3px 7px;font-size:11px}
+ .v1-stage{gap:7px;padding:4px 8px}
+ .v1-screenbox{height:min(100%,calc(100dvh - 140px));border-width:3px}
+ .v1-tabs button{min-height:27px;font-size:10px}
+ .v1-adjust>button{min-height:43px}
+ .v1-swipe span{font-size:12px}
+ .v1-swipe small{font-size:8px}
+ .v1-shortcuts button{min-height:26px;font-size:9px}
+ .v1-controls{gap:4px}
+ .ms-piano{height:clamp(56px,20dvh,92px)}
+ .ms-performance-head{margin-bottom:2px}
+ .ms-performance-head button{min-height:23px;padding:2px 7px}
+ body.v1-no-piano .v1-screenbox{height:min(100%,calc(100dvh - 46px))}
+ body.v1-panel .device{width:min(100%,calc((100dvh - 145px)*1.60256))}
+ body.v1-panel.v1-no-piano .device{width:min(100%,calc((100dvh - 42px)*1.60256))}
+}
+
+
+/* 1.1: mobile-first touch surface, every original hardware action exposed */
+.v1-master{display:flex;align-items:center;gap:8px;min-height:34px;color:#b8c9d3;font-size:11px}
+.v1-master label{font-weight:700;letter-spacing:.04em}
+.v1-master input{flex:1;min-width:0;accent-color:#5fd4a4;min-height:28px;touch-action:none}
+.v1-master span{width:35px;text-align:right;font-variant-numeric:tabular-nums}
+.v1-shortcuts{grid-template-columns:repeat(6,minmax(0,1fr))}
+.v1-shortcuts button.v1-held{background:#26765e;color:white}
+.v1-stage{touch-action:manipulation}
+.ms-piano,.ms-piano *{touch-action:none;-webkit-user-select:none;user-select:none}
+.ms-white,.ms-black{pointer-events:none}
+.ms-performance{touch-action:manipulation}
+@media (orientation:portrait) and (max-width:700px){
+ .v1-stage{grid-template-rows:minmax(0,1fr) auto;gap:3px;padding:3px}
+ .v1-controls{gap:4px}
+ .v1-tabs button{min-height:32px}
+ .v1-shortcuts button{min-height:31px}
+ .v1-screenbox{height:min(100%,calc(100dvh - 405px))}
+ .v1-adjust>button{min-height:48px}
+ .v1-master{min-height:28px}
+ .ms-piano{height:clamp(96px,21dvh,160px)}
+}
+@media (orientation:landscape) and (max-height:530px){
+ .v1-shortcuts{grid-template-columns:repeat(6,minmax(0,1fr))}
+ .v1-master{min-height:22px}
+ .v1-master input{min-height:22px}
+ .v1-screenbox{height:min(100%,calc(100dvh - 150px))}
+}
+
+/* 1.2 keyboard navigation */
+.ms-range{display:flex;align-items:center;justify-content:center;gap:9px;min-height:28px;margin:2px 0 4px;color:#d8ece6;font-size:12px;font-weight:700}
+.ms-range button{min-width:43px;min-height:29px;padding:3px 9px;background:#283e47}
+.ms-range button:disabled{opacity:.28}.ms-range span{min-width:105px;text-align:center}
+.ms-key-label{position:absolute;bottom:6px;left:3px;font-size:10px;color:#43525b;pointer-events:none}.ms-white{position:relative}
+.v1-shortcuts button,.v1-tabs button,.ms-performance button{border-radius:8px}
+.ms-piano{height:clamp(105px,23dvh,190px)}
+@media (orientation:portrait) and (max-width:700px){.ms-piano{height:clamp(105px,22dvh,180px)}.v1-screenbox{height:min(100%,calc(100dvh - 435px))}}
+@media (orientation:landscape) and (max-height:530px){.ms-range{min-height:22px;margin:0 0 2px;font-size:10px}.ms-range button{min-height:23px}.ms-piano{height:clamp(65px,22dvh,125px)}.v1-screenbox{height:min(100%,calc(100dvh - 165px))}}
+
+/* v1.3: independent performance modes, touch-first */
+.ms-mode{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-bottom:4px}
+.ms-mode button{min-height:34px!important;padding:3px!important;font-size:10px!important;letter-spacing:.03em}
+.ms-mode button.selected{background:#2c8179!important;border-color:#76c8bb!important;color:white}
+.ms-pad-bank{display:flex;align-items:center;justify-content:space-between;margin:2px 0 5px}.ms-pad-bank button{min-height:27px!important}.ms-pad-bank span{font-size:11px}.ms-pad-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;height:clamp(150px,30dvh,285px);touch-action:none}
+.ms-pad-bank[hidden],.ms-pad-grid[hidden],.ms-sequencer[hidden],.ms-piano[hidden],.ms-range[hidden]{display:none!important}
+.ms-pad{border:1px solid #698c94!important;background:#2b4c5b!important;border-radius:11px!important;touch-action:none!important;user-select:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:0!important;font-size:13px!important}
+.ms-pad:nth-child(4n+2){background:#354866!important}.ms-pad:nth-child(4n+3){background:#3d4666!important}
+.ms-pad.on{background:#269e8a!important;box-shadow:inset 0 0 0 2px #a1f7e6}
+.ms-pad small{font-size:9px;opacity:.8}
+.ms-transport{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:7px}
+.ms-transport input[type=number]{width:53px;background:#1b2833;color:white;border:1px solid #61717b;border-radius:5px;padding:4px}
+.ms-transport input[type=range]{width:65px;vertical-align:middle}
+.ms-transport label{font-size:11px}
+.ms-seq-rows{display:grid;gap:3px}
+.ms-seq-row{display:grid;grid-template-columns:42px repeat(16,minmax(0,1fr));gap:2px;align-items:center}
+.ms-seq-row>span{font-size:10px;white-space:nowrap}
+.ms-seq-row button{min-width:0;min-height:24px!important;padding:0!important;border-radius:4px!important;background:#293744!important}
+.ms-seq-row button.hit{background:#269e8a!important}.ms-seq-row button.beat{outline:2px solid #e6ce73}
+.ms-midi-status{font-size:10px;opacity:.7;text-align:center;padding-top:3px}
+@media(max-height:530px) and (orientation:landscape){.ms-pad-grid{height:clamp(65px,25dvh,145px)}.ms-mode button{min-height:23px!important}.ms-midi-status{display:none}.ms-seq-row button{min-height:17px!important}}
+
+/* MultiSynth 1.4 — adaptive workstation */
+main{display:none!important}
+:root{--ms14-bg:#0b1018;--ms14-panel:#151e2a;--ms14-border:#2c3b4a;--ms14-accent:#70e0c1;--ms14-muted:#9baebb}
+html,body{background:var(--ms14-bg)!important;color:#eef5f6!important}
+body{grid-template-rows:58px minmax(0,1fr)!important;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+.v1-header{grid-row:1!important;background:#111923!important;border-bottom:1px solid #2b3a48;padding:7px 14px;gap:12px}
+.v1-brand{align-items:center}.v1-brand b{font-size:18px;letter-spacing:.04em}.v1-brand span{font-size:11px}
+.ms14-nav{display:flex;gap:5px;min-width:0;overflow-x:auto;scrollbar-width:none;align-items:center}
+.ms14-nav::-webkit-scrollbar{display:none}
+.ms14-nav button,.ms14-layout,.ms14-help{border:1px solid transparent;border-radius:11px;background:transparent;color:#b6c8d1;font:600 12px system-ui;min-height:40px;padding:7px 13px;white-space:nowrap;cursor:pointer}
+.ms14-nav button[aria-selected=true]{color:#081b19;background:var(--ms14-accent);border-color:var(--ms14-accent)}
+.ms14-layout,.ms14-help{background:#202c39;border-color:#334757}
+.v1-actions{align-items:center;flex-shrink:0}.v1-actions #v1-view,.v1-actions #v1-piano-toggle{display:none}
+.ms14-page{grid-row:2;min-height:0;display:none;overflow:hidden}
+body.ms14-play #ms-performance,body.ms14-seq #ms-performance,body.ms14-drums #ms-performance,body.ms14-pads #ms-performance{display:flex!important}
+body.ms14-play #v1-stage,body.ms14-seq #v1-stage,body.ms14-drums #v1-stage,body.ms14-pads #v1-stage{display:none!important}
+body.ms14-play #ms-performance,body.ms14-seq #ms-performance,body.ms14-drums #ms-performance,body.ms14-pads #ms-performance{
+ grid-row:2!important;position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;
+ width:100%;height:100%;min-height:0;margin:0!important;max-width:none;padding:clamp(12px,2.2vw,30px)!important;
+ border:0;border-radius:0;display:flex;flex-direction:column;gap:12px;justify-content:center;background:radial-gradient(ellipse at 55% 0%,#1d3440,#101823 55%,#0b1018)
+}
+.ms-performance-head{width:min(100%,1120px);margin:0 auto!important}
+.ms-performance-head strong{display:block!important;font-size:clamp(13px,2vw,21px)!important;letter-spacing:.02em}
+.ms-performance button{cursor:pointer;transition:background .12s,border-color .12s}
+.ms-performance button:focus-visible,.ms14-nav button:focus-visible{outline:2px solid #a2f8dd;outline-offset:2px}
+.ms-mode{display:none!important}
+.ms-piano{height:clamp(170px,44dvh,420px)!important;max-height:60%;width:min(100%,1120px);margin:0 auto;border-radius:13px}
+.ms-range{margin:0 auto!important}
+.ms-pad-grid{width:min(100%,720px);height:min(66dvh,540px);margin:0 auto;gap:9px}
+.ms-pad{border-radius:17px!important;font-size:20px!important}.ms-pad small{font-size:11px}
+.ms-sequencer{width:min(100%,1200px);margin:0 auto;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.ms-seq-rows{gap:12px}.ms-seq-row{grid-template-columns:68px repeat(16,minmax(0,1fr));gap:5px}
+.ms-seq-row button{height:clamp(26px,7dvh,60px);min-height:0!important;border-radius:8px!important}
+.ms-seq-row>span{font-size:12px}
+.ms-midi-status{position:absolute;bottom:12px;left:0;right:0;font-size:11px}
+body.ms14-seq .ms-performance-head,body.ms14-seq .ms-midi-status{display:none!important}
+body.ms14-original main{display:flex!important;grid-row:2!important;max-height:100%;padding:8px!important}
+body.ms14-original .device{width:min(100%,calc((100dvh - 80px)*1.60256));max-height:100%}
+body.ms14-edit #v1-stage,body.ms14-presets #v1-stage,body.ms14-fx #v1-stage{display:grid!important;grid-row:2!important}
+body.ms14-edit #ms-performance,body.ms14-presets #ms-performance,body.ms14-fx #ms-performance{display:none!important}
+.v1-stage{height:100%;padding:clamp(12px,2vw,30px)!important;grid-template-columns:minmax(0,1fr) minmax(280px,1fr);gap:clamp(12px,3vw,50px)}
+.v1-screenbox{height:min(65dvh,520px)!important;max-height:100%;border:8px solid #273747;border-radius:24px;box-shadow:0 18px 45px #0008}
+.v1-controls{gap:14px;max-width:650px;width:100%;margin:auto}
+.v1-tabs{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.v1-tabs button,.v1-shortcuts button{min-height:43px;border-radius:11px;background:#202e3c;border:1px solid #394c5d;color:#dce9ed;font-size:12px}
+.v1-tabs button.active{background:#276e60;border-color:#6ce0bc}
+.v1-adjust{grid-template-columns:55px minmax(0,1fr) 55px;align-items:center}
+.v1-adjust>button{min-height:65px}
+.v1-swipe{height:120px;border-radius:18px;background:#172530;border:1px solid #385265;cursor:ns-resize;touch-action:none;position:relative;gap:0}
+.v1-swipe small{font-size:10px}
+.ms14-dial{width:72px;height:72px;border:7px solid #364a58;border-top-color:#79e8c7;border-radius:50%;background:radial-gradient(circle,#283b49,#17242e);box-shadow:inset 0 2px 8px #0008;display:grid;place-items:center;color:#e8f8f3;font-size:18px;font-weight:700;pointer-events:none}
+.v1-shortcuts{grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}
+.ms14-help-panel{position:fixed;z-index:120;inset:65px 12px 12px auto;width:min(400px,calc(100vw - 24px));overflow:auto;background:#172331;border:1px solid #466071;border-radius:18px;padding:22px;box-shadow:0 20px 70px #000a;color:#ecf6f6;box-sizing:border-box}
+.ms14-help-panel[hidden]{display:none}.ms14-help-panel h2{margin:0 0 12px}.ms14-help-panel p{line-height:1.6}
+.ms14-help-panel button{background:#294454;color:white;border:1px solid #587d89;border-radius:10px;padding:10px}
+.ms14-status{position:fixed;z-index:100;inset:58px 0 0;background:#0a111adf;display:grid;place-items:center;text-align:center;padding:20px}
+.ms14-status[hidden]{display:none}
+.ms14-status-inner{max-width:440px;padding:32px;border:1px solid #36505b;border-radius:24px;background:#15222e}
+.ms14-status h1{font-size:26px;margin:0 0 10px}.ms14-status p{color:#b2c4cd;line-height:1.6}
+.ms14-status button{background:#70e0c1;border:0;color:#09201b;font:700 16px system-ui;padding:14px 24px;border-radius:12px;cursor:pointer}
+.ms14-layout{font-size:11px}
+body.ms14-desktop .v1-stage{grid-template-columns:minmax(0,1fr) minmax(280px,1fr)}
+body.ms14-mobile .v1-stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;gap:8px}
+body.ms14-mobile .v1-screenbox{height:min(33dvh,280px)!important}
+body.ms14-mobile .v1-controls{gap:7px}
+body.ms14-mobile .v1-swipe{height:82px}
+body.ms14-mobile .ms14-dial{height:49px;width:49px;border-width:5px}
+body.ms14-mobile .v1-shortcuts button,body.ms14-mobile .v1-tabs button{min-height:33px;font-size:10px}
+body.ms14-mobile .ms-pad-grid{height:min(63dvh,520px)}
+@media(max-width:750px){
+ body{grid-template-rows:52px minmax(0,1fr)!important}
+ .v1-header{padding:5px 7px;gap:5px}
+ .v1-brand{display:none}.ms14-nav{flex:1}
+ .ms14-nav button{min-height:38px;padding:6px 10px;font-size:11px}
+ .ms14-layout,.ms14-help{padding:5px 7px;min-height:36px;font-size:10px}
+ .v1-actions button{min-height:35px!important;padding:4px 7px!important}
+ .v1-stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;gap:8px;padding:7px!important}
+ .v1-screenbox{height:min(32dvh,250px)!important;border-width:4px;border-radius:14px}
+ .v1-controls{gap:7px}
+ .v1-swipe{height:84px}.ms14-dial{height:48px;width:48px;border-width:5px}
+ .v1-tabs button,.v1-shortcuts button{min-height:33px;font-size:10px;padding:3px}
+ .v1-adjust>button{min-height:53px}
+ .ms-piano{height:clamp(140px,45dvh,330px)!important}
+ .ms-performance-head strong{font-size:14px!important}
+ .ms-seq-row{grid-template-columns:44px repeat(16,minmax(0,1fr));gap:2px}
+ .ms-seq-rows{gap:8px}.ms-seq-row button{border-radius:4px!important}
+ .ms-seq-row>span{font-size:9px}
+}
+@media(max-height:480px){
+ .ms14-nav button{min-height:30px}
+ .ms-performance-head{display:none!important}
+ .ms-piano{height:65dvh!important}
+ .ms-pad-grid{height:75dvh}
+ .v1-stage{grid-template-columns: minmax(0,1fr) minmax(280px,1fr);grid-template-rows:1fr}
+ .v1-screenbox{height:60dvh!important}
+ .v1-shortcuts button{min-height:24px}
+ .v1-tabs button{min-height:26px}
+}
+
+
+/* v1.5 / ATOMIC GREEN: vintage laboratory control room, modern usability */
+:root{--ms14-bg:#101c18;--ms14-panel:#263a33;--ms14-border:#526d5e;--ms14-accent:#b8edaa;--ms14-muted:#a6b9a9;--bg:#7b9585;--fg:#12241d;--dim:#4b6255;--rule:#6f897a;--body:#243c32;--tray:#1b2c26;--part:#324b3e;--edge:#648071;--label:#dce8d6;--lit:#e6b66d;--green:#a5e6a3;color-scheme:dark}
+html,body{background:#101c18!important;color:#e3ecdd!important}
+body{background:radial-gradient(ellipse at 50% -20%,#344b3d 0%,#17261e 47%,#0e1915 100%)!important}
+.v1-header{background:linear-gradient(180deg,#344c3e,#23382f)!important;border-bottom:2px solid #708778!important;box-shadow:0 3px 12px #0006}
+.v1-brand b{color:#d1edbe!important;letter-spacing:.16em!important;text-shadow:0 0 12px #b6e9a344}
+.v1-brand span{color:#b8c7b0!important}
+.ms14-nav button{color:#c2d1c1!important;letter-spacing:.025em;border:1px solid transparent}
+.ms14-nav button:hover{background:#455c4b!important}
+.ms14-nav button[aria-selected=true]{color:#15261a!important;background:linear-gradient(180deg,#c3edb4,#9bcf92)!important;border:1px solid #e1f4cb!important;box-shadow:0 2px 0 #67886a,0 0 13px #b8f5a42c}
+.ms14-layout,.ms14-help,.v1-actions button{background:#344b3e!important;color:#e3ecd8!important;border:1px solid #718a73!important}
+body.ms14-play #ms-performance,body.ms14-seq #ms-performance,body.ms14-drums #ms-performance,body.ms14-pads #ms-performance{background:radial-gradient(ellipse at 55% 0%,#314a3b,#1b3026 54%,#12221b)!important}
+.ms-performance-head strong{font-family:ui-monospace,Consolas,monospace!important;letter-spacing:.16em!important;color:#d6f5c7!important}
+.ms-performance-head strong:before{content:'●';font-size:9px;color:#e1b465;margin-right:10px;text-shadow:0 0 9px #e1b465}
+.ms-performance button,.ms-pad-bank button,.ms-transport button,.ms-range button{background:linear-gradient(#4b6452,#344a3d)!important;color:#e8eedc!important;border:1px solid #829681!important;border-bottom:3px solid #22352a!important;box-shadow:0 2px 6px #0005}
+.ms-performance button:active,.v1-shortcuts button:active{transform:translateY(1px);border-bottom-width:1px!important}
+.ms-pad{background:linear-gradient(145deg,#415c49,#263f32)!important;border:2px solid #78907a!important;color:#e4f2d9!important;box-shadow:inset 0 1px 0 #a6bba344,0 4px 8px #0005!important}
+.ms-pad:active,.ms-pad.pressed{background:#b2e3a5!important;color:#13261a!important;box-shadow:0 0 20px #a8ed9988!important}
+.ms-pad small{color:#c4d5b9!important}
+.ms-piano{border:7px solid #4c6654!important;border-top:12px solid #4c6654!important;box-shadow:0 10px 30px #0009,inset 0 2px 4px #0008}
+.ms-white{background:linear-gradient(90deg,#e7e9d6,#f4f0dc 50%,#d5d9c6)!important;border-color:#73806e!important}
+.ms-white.pressed{background:#a6d69b!important}
+.ms-black{background:linear-gradient(90deg,#111e19,#2a3c31 50%,#101d17)!important;border-color:#728473!important;box-shadow:2px 4px 6px #0007}
+.ms-black.pressed{background:#648c65!important}
+.ms-range,.ms-pad-bank,.ms-transport{color:#d8e9cc!important}
+.ms-seq-row button{background:#354e3c!important;border:1px solid #69826d!important;box-shadow:inset 0 2px 4px #0004}
+.ms-seq-row button.on,.ms-seq-row button.active,.ms-seq-row button[aria-pressed=true]{background:#d2aa68!important;box-shadow:0 0 9px #e0ac5977!important}
+.ms-seq-row>span{color:#d3e9ca!important;font-family:ui-monospace,monospace}
+.ms-transport input{accent-color:#d9ae6b}
+.v1-stage{background:radial-gradient(ellipse at 40% 20%,#263e31,#13231b)!important}
+.v1-screenbox{background:#091e12!important;border-color:#516b54!important;box-shadow:0 0 0 2px #263f30,0 14px 34px #000a,inset 0 0 20px #b1f4a21b!important}
+#v1-screen{filter:sepia(.34) hue-rotate(55deg) saturate(.95) contrast(1.08);}
+.v1-tabs button,.v1-shortcuts button{background:linear-gradient(#435b49,#2b4133)!important;color:#e2eed8!important;border:1px solid #7b947a!important;border-bottom:3px solid #1c3024!important;box-shadow:0 3px 7px #0005}
+.v1-tabs button.active{background:linear-gradient(#b7dda4,#7ea57d)!important;color:#142b1d!important;border-color:#d4f1c4!important}
+.v1-adjust>button{background:#354f3e!important;border:1px solid #7b947a!important;color:#dff1d3!important;border-radius:13px}
+.v1-swipe{background:radial-gradient(circle at 50% 40%,#415c46,#233a2c)!important;border:1px solid #769278!important;color:#e6efd9!important;box-shadow:inset 0 3px 12px #0006,0 3px 10px #0004}
+.ms14-dial{border:7px solid #6c8c71!important;border-top-color:#dcb16e!important;background:radial-gradient(circle at 40% 30%,#5a755d,#223b2b)!important;color:#f1e6c9!important;box-shadow:inset 0 2px 9px #0009,0 3px 7px #0007!important}
+.v1-master input{accent-color:#b5e7a7}
+.ms14-help-panel{background:#273d30!important;border-color:#829781!important;color:#eaf0df!important}
+.ms14-help-panel button{background:#435f4a!important;border-color:#8b9f82!important}
+.ms14-status{background:#101c16ed!important}
+.ms14-status-inner{background:linear-gradient(145deg,#344d3c,#1b3025)!important;border:2px solid #7a9278!important;box-shadow:0 22px 65px #000b!important}
+.ms14-status h1{font-family:ui-monospace,monospace;letter-spacing:.07em;color:#e5f1d9}
+.ms14-status h1 span{color:#b9eaaa!important;text-shadow:0 0 14px #b6eaa45a}
+.ms14-status button{background:#b8e5a4!important;color:#1b301e!important;border-bottom:3px solid #66875b!important}
+.ms14-status p{color:#c6d4be!important}
+.ms14-help-panel h2{color:#b8e9ab}
+.ms-midi-status{color:#b1c5b0!important}
+body.ms14-original main{background:#253c2e!important}
+@media(max-width:750px){.ms14-dial{border-width:5px!important}}
+
+</style>
+</head>
+<body>
+<header class="v1-header"><div class="v1-brand"><b>JIANT</b><span>MultiSynth 1.5</span></div><nav class="ms14-nav" aria-label="Secciones"><button data-page="play">Tocar</button><button data-page="pads">Pads</button><button data-page="drums">Batería</button><button data-page="seq">Secuenciador</button><button data-page="edit">Síntesis</button><button data-page="presets">Presets</button><button data-page="fx">Efectos</button><button data-page="original">Original</button></nav><div class="v1-actions"><button id="ms14-layout" class="ms14-layout" title="Cambiar distribución">Auto</button><button id="ms14-help" class="ms14-help" aria-label="Ayuda">?</button><button id="v1-view" aria-pressed="false">Original</button><button id="v1-piano-toggle">Teclas</button><button id="ms-fullscreen" title="Pantalla completa" aria-label="Pantalla completa">⛶</button></div></header>
+<section id="v1-stage" class="v1-stage">
+  <div class="v1-screenbox"><canvas id="v1-screen" width="240" height="240" aria-label="Visualización original de JIANT"></canvas><div id="v1-overlay" class="v1-overlay">Pulsa «Switch on» para activar JIANT</div></div>
+  <div class="v1-controls">
+    <div class="v1-tabs" id="v1-tabs"><button data-encoder="SELECT">SELECT</button><button data-encoder="PRESETS">PRESETS</button><button data-encoder="ALGORITHM">ALGORITHM</button><button data-encoder="KNOB 1">K1</button><button data-encoder="KNOB 2">K2</button><button data-encoder="KNOB 3">K3</button><button data-encoder="KNOB 4">K4</button></div>
+    <div class="v1-adjust"><button id="v1-minus" aria-label="Reducir parámetro">−</button><div class="v1-swipe" id="v1-swipe" tabindex="0" role="group" aria-label="Ajustar parámetro con arrastre, rueda o flechas"><div class="ms14-dial" aria-hidden="true">↻</div><span id="v1-param">SELECT</span><small>GIRA · RUEDA · FLECHAS</small></div><button id="v1-plus" aria-label="Aumentar parámetro">+</button></div>
+    <div class="v1-shortcuts" id="v1-shortcuts"><button data-action="HOME">HOME</button><button data-action="EDIT">EDIT</button><button data-action="ENV">ENV</button><button data-action="LFO">LFO</button><button data-action="FX">FX</button><button data-action="ARP">ARP</button><button data-action="SEQ">SEQ</button><button data-action="PLAY">PLAY</button><button data-action="SAVE">SAVE</button><button data-action="GLO">GLO</button><button data-action="SCL">SCL</button><button data-action="REC">REC</button></div>
+<div class="v1-master"><label for="v1-volume">MASTER</label><input id="v1-volume" type="range" min="0" max="1023" value="700" step="1" aria-label="Volumen maestro"><span id="v1-volume-value">68%</span></div>
+  </div>
+</section>
+<section class="ms-performance" id="ms-performance"><div class="ms-performance-head"><strong>TECLADO</strong><div><button type="button" id="ms-octdown">− OCT</button><button type="button" id="ms-octup">+ OCT</button><button type="button" id="ms-panic">SOLTAR</button></div></div><div class="ms-mode"><button data-mode="piano" class="selected">PIANO</button><button data-mode="pads">PADS</button><button data-mode="drums">DRUMS</button><button data-mode="seq">SECUENCIADOR</button></div><div class="ms-range"><button type="button" id="ms-range-prev" aria-label="Notas más graves">◀</button><span id="ms-range-label">F3 – G5</span><button type="button" id="ms-range-next" aria-label="Notas más agudas">▶</button></div><div class="ms-piano" id="ms-piano" aria-label="Piano táctil polifónico"></div><div class="ms-pad-bank" id="ms-pad-bank" hidden><button id="ms-pad-prev">◀ Banco</button><span id="ms-pad-label">Notas 1–16</span><button id="ms-pad-next">Banco ▶</button></div><div class="ms-pad-grid" id="ms-pad-grid" hidden></div><div class="ms-sequencer" id="ms-sequencer" hidden><div class="ms-transport"><button id="ms-seq-play">▶ Iniciar</button><button id="ms-seq-clear">Borrar</button><label>BPM <input id="ms-bpm" type="number" min="45" max="240" value="110"></label><label>Swing <input id="ms-swing" type="range" min="0" max="65" value="0"></label></div><div class="ms-seq-rows" id="ms-seq-rows"></div></div><div class="ms-midi-status" id="ms-midi-status">MIDI: pendiente de conectar</div></section>
+<section class="ms-edit" id="ms-edit"><div class="ms-edit-head"><strong>Ajuste de encoder</strong><select id="ms-encoder" aria-label="Seleccionar encoder"></select><button type="button" id="ms-closeedit">✕</button></div><div class="ms-controls" id="ms-controls"></div><small>Los ajustes son relativos, como en los encoders físicos.</small></section>
+
+<aside class="ms14-help-panel" id="ms14-help-panel" hidden><button id="ms14-close-help" style="float:right">Cerrar ✕</button><h2>Guía rápida</h2><p><b>Tocar:</b> piano multitáctil. Usa ◀ ▶ para desplazarte por el registro.</p><p><b>Pads / Batería:</b> 16 superficies para notas o percusión sintetizada.</p><p><b>Secuenciador:</b> cuatro pistas, 16 pasos, BPM y swing. Pulsa las celdas para activar sonidos.</p><p><b>Síntesis:</b> selecciona un encoder y gira la rueda virtual, usa el ratón o las flechas.</p><p><b>Presets y efectos:</b> acceden a los controles originales de JIANT; los sonidos guardados dependen del firmware.</p><p><b>MIDI:</b> conecta el Launchkey Mini MK4 por USB y concede permiso en Chrome o Edge. La asignación exacta de pads y controles necesita validación con el dispositivo.</p><p><b>Audio:</b> utiliza auriculares con cable o altavoces conectados directamente para reducir la latencia añadida por Bluetooth.</p></aside>
+<div class="ms14-status" id="ms14-status"><div class="ms14-status-inner"><h1>MultiSynth <span style="color:#b8edaa">JIANT</span></h1><p>Motor FM original · teclado · pads · secuenciador · MIDI</p><button id="ms14-start">Activar instrumento</button><p id="ms14-bootmsg" style="font-size:12px">El sonido se inicia al pulsar el botón.</p></div></div>
+<main>
+<div class="device" id="device">
+  <svg id="panel" viewBox="0 0 1000 624" aria-hidden="true"></svg>
+  <canvas id="screen" width="240" height="240" role="img" aria-label="The screen"></canvas>
+  <div class="start" id="start"><button id="go" type="button">Switch on</button><p id="status" hidden></p></div>
+</div>
+
+
+<p class="keys">
+  <span><kbd>Z</kbd>–<kbd>'</kbd> <kbd>Q</kbd>–<kbd>O</kbd> keys</span>
+  <span><kbd>1</kbd>–<kbd>=</kbd> FX … REC</span>
+  <span><kbd>[</kbd> <kbd>]</kbd> OCT</span>
+  <span><kbd>↑</kbd> <kbd>↓</kbd> SELECT</span>
+  <span><kbd>←</kbd> <kbd>→</kbd> ALGORITHM</span>
+  <span><kbd>Shift</kbd>-click holds a button</span>
+</p>
+
+
+<p class="kofi" style="border-left:3px solid #ec6e50;padding:4px 0 4px 12px">If you resonate with my work, consider supporting me on <a href="https://ko-fi.com/juanjiant" target="_blank" rel="noopener" style="color:inherit;font-weight:600">Ko-fi</a> (in Argentina: <a href="https://cafecito.app/juanjiant" target="_blank" rel="noopener" style="color:inherit;font-weight:600">Cafecito</a>). Thanks for all the good energy, hope you enjoy this little beast 🫶✨🎹</p>
+<footer>
+  <small class="version">@VERSION@@PREVIEW@</small><br>
+  JIANT FM by Juan Jiant · <a href="https://www.gnu.org/licenses/gpl-3.0.html">GPL-3.0</a> · browser build after charlesvestal's <a href="https://github.com/charlesvestal/fm1-x0x">X0X</a> · DotGothic16 font, <a href="fonts/OFL.txt">SIL OFL 1.1</a><br>
+  <nav><a href="../">JIANT home</a> · <a href="https://github.com/juanjiant-bit/JIANT">Source</a> · <a href="../webapp/installer/">Installer (approved version)</a> ·
+    <a href="../webapp/editor/">Editor</a></nav>
+  <small>M-VAVE and FM-1 are trademarks of their respective owners. JIANT is not affiliated with or endorsed by them, nor with Hügelton Instruments.</small>
+</footer>
+</main>
+
+<script type="module">
+const NS = "http://www.w3.org/2000/svg";
+// panel.c's labels (bit = label) and encoder roles
+const B = { FX: 0, SCL: 1, ENV: 2, LFO: 3, EDIT: 4, GLO: 5, HOME: 6, SAVE: 7, ARP: 8, SEQ: 9, PLAY: 10, REC: 11, "OCT-": 12, "OCT+": 13 };
+const EN = { SELECT: 0, ALGORITHM: 1, PRESETS: 2, "KNOB 1": 3, "KNOB 2": 4, "KNOB 3": 5, "KNOB 4": 6 };
+const PLAY_GREEN = 14;
+// the 27 keys F3..G5: key k = k semitones above F3
+const WHITE = [0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26];
+const BLACK = [1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25];
+const BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14];      // the white key each black one follows
+const STORE = "felucca-emu-flash";
+
+// ------------------------------------------------------------------ the panel
+// Two drawings of the same controls: WIDE after the FM-1's own layout, TALL for a phone held upright (the
+// screen larger, the keys across the whole width). Rebuilt when the orientation changes; the state stays.
+const ROW1 = ["FX", "SCL", "ENV", "LFO", "EDIT", "GLO"], ROW2 = ["HOME", "SAVE", "ARP", "SEQ", "PLAY", "REC"];
+const KNOBS = ["MASTER", "SELECT", "PRESETS", "ALGORITHM", "KNOB 1", "KNOB 2", "KNOB 3", "KNOB 4"];
+const LAYOUTS = {
+  wide: {
+    w: 1000, h: 624, screen: [292, 44, 256],
+    knobs: [[105, 100, 24], [215, 100, 24], [105, 205, 24], [215, 205, 24], [610, 100, 22], [714, 100, 22], [818, 100, 22], [922, 100, 22]],
+    trays: [[50, 250, 220, 50], [568, 160, 400, 140]],
+    oct: [[60, 258, 90, 34], [170, 258, 90, 34]],
+    grid: [582, 174, 54, 48, 63, 62], keybed: [36, 332, 928, 256],
+  },
+  tall: {
+    w: 600, h: 1070, screen: [130, 104, 340],
+    knobs: [[66, 64, 24], [186, 64, 24], [414, 64, 24], [534, 64, 24], [90, 512, 26], [230, 512, 26], [370, 512, 26], [510, 512, 26]],
+    trays: [[14, 572, 572, 146], [150, 728, 300, 62]],
+    oct: [[164, 737, 128, 44], [308, 737, 128, 44]],
+    grid: [24, 582, 86, 60, 94, 70], keybed: [14, 800, 572, 256],
+  },
+};
+const svg = document.getElementById("panel"), device = document.getElementById("device"), canvas = document.getElementById("screen");
+function el(tag, attrs, parent = svg) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  parent.appendChild(e);
+  return e;
+}
+const SANS = "-apple-system, 'Helvetica Neue', Arial, sans-serif", DOT = "'DotGothic16', " + SANS;
+function label(parent, x, y, s, size, font = SANS, ink = "var(--label)") {
+  const t = el("text", { x, y, "text-anchor": "middle", "font-family": font,
+                         "font-size": size, "font-weight": 600, fill: ink, "letter-spacing": ".04em" }, parent);
+  t.textContent = s;
+  return t;
+}
+const KEYNAMES = ["F", "F♯", "G", "G♯", "A", "A♯", "B", "C", "C♯", "D", "D♯", "E"];
+const keyName = (k) => KEYNAMES[k % 12] + (3 + Math.floor((k + 5) / 12));
+
+let node = null, btnMask = 0, keyMask = 0, latched = 0, masterValue = 700, lastLeds = [0, 0, 0, 0, 0], layout = null;
+const angle = Object.fromEntries(KNOBS.map((n) => [n, 0]));
+angle.MASTER = -135 + 270 * masterValue / 1023;
+const knobs = [], buttons = [], keys = [];
+const btnBy = new Map(), keyBy = new Map();                   // pointer / key code -> label bit or key
+const send = (m) => { if (node) node.port.postMessage(m); };
+
+function build(name) {
+  const L = LAYOUTS[name];
+  layout = name;
+  svg.innerHTML = "";
+  svg.setAttribute("viewBox", `0 0 ${L.w} ${L.h}`);
+  device.style.aspectRatio = `${L.w} / ${L.h}`;
+  for (const d of device.querySelectorAll(".hit")) d.remove();
+  knobs.length = buttons.length = keys.length = 0;
+  el("rect", { x: 4, y: 4, width: L.w - 8, height: L.h - 8, rx: 40, fill: "var(--body)" });
+  for (const [x, y, w, h] of L.trays) el("rect", { x, y, width: w, height: h, rx: 14, fill: "var(--tray)" });
+  const [sx, sy, ss] = L.screen;
+  el("rect", { x: sx, y: sy, width: ss, height: ss, rx: 18, fill: "#0b0b0c" });
+  const inset = ss / 32;                                         // the 240 x 240 panel inside its bezel
+  Object.assign(canvas.style, { left: `${(sx + inset) / L.w * 100}%`, top: `${(sy + inset) / L.h * 100}%`,
+                                width: `${(ss - 2 * inset) / L.w * 100}%`, height: `${(ss - 2 * inset) / L.h * 100}%` });
+  KNOBS.forEach((n, i) => {
+    const [x, y, r] = L.knobs[i], g = el("g", {});
+    el("circle", { cx: x, cy: y, r: r + 5, fill: "var(--tray)" }, g);
+    el("circle", { cx: x, cy: y, r, fill: "var(--part)", stroke: "var(--edge)", "stroke-width": 2 }, g);
+    const ind = n === "MASTER" ? el("line", { x1: x, y1: y - r + 5, x2: x, y2: y - r + 14, stroke: "var(--label)", "stroke-width": 3, "stroke-linecap": "round" }, g) : null;
+    label(g, x, y - r - 12, n, 16, DOT);
+    el("circle", { cx: x, cy: y, r: r + 12, fill: "transparent" }, g);
+    knobs.push({ g, ind, x, y, name: n, role: n === "MASTER" ? "master" : EN[n] });
+  });
+  const button = ([x, y, w, h], n, sub) => {
+    const g = el("g", {});
+    el("rect", { x, y, width: w, height: h, rx: 8, fill: "var(--part)", stroke: "var(--edge)", "stroke-width": 1.5, class: "face btn" }, g);
+    const ink = n === "REC" ? "#ff453a" : undefined;
+    if (sub) { label(g, x + w / 2, y + h / 2 - 2, n, 10.8, SANS, ink); label(g, x + w / 2, y + h / 2 + 11, sub, 9.9); }
+    else label(g, x + w / 2, y + h / 2 + 4.5, n, 12.6, SANS, ink);
+    buttons.push({ g, bit: B[n], name: sub ? `${n} / ${sub}` : n });
+  };
+  button(L.oct[0], "OCT-");
+  button(L.oct[1], "OCT+");
+  const [gx, gy, gw, gh, dx, dy] = L.grid;
+  for (let i = 0; i < 6; i++) {
+    button([gx + i * dx, gy, gw, gh], ROW1[i]);
+    button([gx + i * dx, gy + dy, gw, gh], ROW2[i], ROW2[i] === "PLAY" ? "STOP" : "");
+  }
+  const [x0, y0, w, h] = L.keybed;
+  el("rect", { x: x0, y: y0, width: w, height: h, rx: 18, fill: "var(--tray)" });
+  // the keys: two rows of the same black keys, each with a slit down its middle that lights
+  const pitch = (w - 24) / 16, kw = pitch * 0.78, kh = h * 0.425, sw = Math.max(3, kw * 0.14);
+  const key = (cx, cy, k) => {
+    const g = el("g", {}), y = cy - kh / 2;
+    el("rect", { x: cx - kw / 2, y, width: kw, height: kh, rx: kw / 2, class: "face key" }, g);
+    el("rect", { x: cx - sw / 2, y: y + kw * 0.4, width: sw, height: kh - kw * 0.8, rx: sw / 2, class: "slit" }, g);
+    el("rect", { x: cx - pitch / 2, y: cy - h * 0.24, width: pitch, height: h * 0.48, fill: "transparent" }, g);   // its target
+    keys[k] = { g, name: keyName(k) };
+  };
+  WHITE.forEach((k, i) => key(x0 + 12 + (i + 0.5) * pitch, y0 + h * 0.75, k));
+  BLACK_AFTER.forEach((a, j) => key(x0 + 12 + (a + 1) * pitch, y0 + h * 0.25, BLACK[j]));
+  // HTML targets over the drawing (pointer-events: none): touch-action and pointer capture work on them everywhere
+  const hit = (c, cls, role) => {
+    const b = c.g.getBBox(), d = document.createElement("div");
+    d.className = "hit" + (cls ? " " + cls : "");
+    Object.assign(d.style, { left: `${b.x / L.w * 100}%`, top: `${b.y / L.h * 100}%`,
+                             width: `${b.width / L.w * 100}%`, height: `${b.height / L.h * 100}%` });
+    d.setAttribute("role", role);
+    d.setAttribute("aria-label", c.name);
+    d.title = c.name;
+    d.tabIndex = 0;
+    d.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
+    d.addEventListener("contextmenu", (e) => e.preventDefault());
+    device.insertBefore(d, document.getElementById("start"));
+    c.hit = d;
+  };
+  knobs.forEach((k) => { hit(k, "knob", "slider"); bindKnob(k); drawKnob(k); });
+  buttons.forEach((b) => { hit(b, "", "button"); bindButton(b); });
+  keys.forEach((k, i) => { hit(k, "", "button"); bindKey(k, i); });
+  syncButtons(true);
+  syncKeys(true);
+  drawLights(lastLeds);
+}
+
+// ------------------------------------------------------------------ input
+function syncButtons(redraw) {
+  let m = latched;
+  for (const b of btnBy.values()) m |= 1 << b;
+  if (m !== btnMask) { btnMask = m; send({ type: "buttons", mask: m }); }
+  else if (!redraw) return;
+  for (const b of buttons) {
+    const on = !!(m & (1 << b.bit));
+    b.g.classList.toggle("held", on);
+    b.g.classList.toggle("latched", !!(latched & (1 << b.bit)));
+    b.hit.setAttribute("aria-pressed", on);
+  }
+}
+function syncKeys(redraw) {
+  let m = 0;
+  for (const k of keyBy.values()) m |= 1 << k;
+  if (m !== keyMask) { keyMask = m; send({ type: "keys", mask: m }); }
+  else if (!redraw) return;
+  keys.forEach((k, i) => k.g.classList.toggle("held", !!(m & (1 << i))));
+}
+function bindButton(b) {
+  b.hit.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    if (e.shiftKey || e.button === 2) { latched ^= 1 << b.bit; syncButtons(true); return; }
+    if (latched & (1 << b.bit)) { latched &= ~(1 << b.bit); syncButtons(true); return; }
+    b.hit.setPointerCapture(e.pointerId);
+    btnBy.set("p" + e.pointerId, b.bit);
+    syncButtons();
+  });
+  b.hit.addEventListener("keydown", (e) => {
+    if ((e.key === "Enter" || e.key === " ") && !e.repeat) { btnBy.set("f" + b.bit, b.bit); syncButtons(); e.preventDefault(); e.stopPropagation(); }
+  });
+  b.hit.addEventListener("keyup", () => { if (btnBy.delete("f" + b.bit)) syncButtons(); });
+}
+function bindKey(k, i) {
+  k.hit.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    k.hit.setPointerCapture(e.pointerId);
+    keyBy.set("p" + e.pointerId, i);
+    syncKeys();
+  });
+}
+function release(e) {
+  const id = "p" + e.pointerId;
+  if (btnBy.delete(id)) syncButtons();
+  if (keyBy.delete(id)) syncKeys();
+}
+for (const t of ["pointerup", "pointercancel", "lostpointercapture"]) device.addEventListener(t, release);
+
+function drawKnob(k) { if (k.ind) k.ind.setAttribute("transform", `rotate(${angle[k.name]} ${k.x} ${k.y})`); }
+function turn(k, n) {
+  if (!n) return;
+  if (k.role === "master") {
+    masterValue = Math.max(0, Math.min(1023, masterValue + n * 16));
+    angle.MASTER = -135 + 270 * masterValue / 1023;
+    send({ type: "master", value: masterValue });
+  } else {
+    angle[k.name] = (angle[k.name] + n * 18) % 360;            // 20 detents a turn
+    send({ type: "enc", role: k.role, n });
+  }
+  drawKnob(k);
+}
+function bindKnob(k) {
+  let drag = null, wheel = 0;
+  k.hit.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    k.hit.setPointerCapture(e.pointerId);
+    drag = { y: e.clientY, acc: 0 };
+  });
+  k.hit.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    drag.acc += drag.y - e.clientY;
+    drag.y = e.clientY;
+    const step = k.role === "master" ? 3 : 8, n = Math.trunc(drag.acc / step);
+    if (n) { drag.acc -= n * step; turn(k, n); }
+  });
+  const end = () => { drag = null; };
+  k.hit.addEventListener("pointerup", end);
+  k.hit.addEventListener("pointercancel", end);
+  k.hit.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const dy = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+    if (Math.abs(dy) >= 50) { turn(k, dy < 0 ? 1 : -1); wheel = 0; return; }   // a wheel notch: one detent
+    wheel -= dy;                                                                   // a trackpad: by distance
+    const n = Math.trunc(wheel / 25);
+    if (n) { wheel -= n * 25; turn(k, n); }
+  }, { passive: false });
+  k.hit.addEventListener("keydown", (e) => {
+    const d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1 }[e.key];
+    if (d) { turn(k, d); e.preventDefault(); e.stopPropagation(); }
+  });
+}
+const tall = matchMedia("(orientation: portrait) and (max-width: 700px)");
+build(tall.matches ? "tall" : "wide");
+tall.addEventListener("change", () => build(tall.matches ? "tall" : "wide"));
+document.fonts?.load("16px DotGothic16").then(() => build(layout), () => {});   // the labels' width: the hit areas
+
+// the computer keyboard, every key one control: F3..A#4 on the Z (white) and A (black) rows, B4..G5 on Q..O
+// in semitones, the twelve buttons on the number row in the panel's order (held while the key is), [ ] OCT
+const KEYMAP = {};
+["KeyZ", "KeyX", "KeyC", "KeyV", "KeyB", "KeyN", "KeyM", "Comma", "Period", "Slash"].forEach((c, i) => KEYMAP[c] = { key: WHITE[i] });
+[["KeyS", 1], ["KeyD", 3], ["KeyF", 5], ["KeyH", 8], ["KeyJ", 10], ["KeyL", 13], ["Semicolon", 15], ["Quote", 17]].forEach(([c, k]) => KEYMAP[c] = { key: k });
+["KeyQ", "KeyW", "KeyE", "KeyR", "KeyT", "KeyY", "KeyU", "KeyI", "KeyO"].forEach((c, i) => KEYMAP[c] = { key: 18 + i });
+["Digit1", "Digit2", "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9", "Digit0", "Minus", "Equal"]
+  .forEach((c, i) => KEYMAP[c] = { btn: B[[...ROW1, ...ROW2][i]] });
+Object.assign(KEYMAP, { BracketLeft: { btn: B["OCT-"] }, BracketRight: { btn: B["OCT+"] } });
+const ARROWS = { ArrowUp: [EN.SELECT, 1], ArrowDown: [EN.SELECT, -1], ArrowRight: [EN.ALGORITHM, 1], ArrowLeft: [EN.ALGORITHM, -1] };
+addEventListener("keydown", (e) => {
+  if (!node || e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.(".hit.knob")) return;
+  if (ARROWS[e.code]) { const [r, n] = ARROWS[e.code]; turn(knobs.find((k) => k.role === r), n); e.preventDefault(); return; }
+  const m = KEYMAP[e.code];
+  if (!m) return;
+  e.preventDefault();
+  if (e.repeat) return;
+  if (m.key !== undefined) { keyBy.set("k" + e.code, m.key); syncKeys(); }
+  else { btnBy.set("k" + e.code, m.btn); syncButtons(); }
+});
+addEventListener("keyup", (e) => {
+  const id = "k" + e.code;
+  if (keyBy.delete(id)) syncKeys();
+  if (btnBy.delete(id)) syncButtons();
+});
+addEventListener("blur", () => {
+  for (const id of [...btnBy.keys()]) if (id[0] !== "p") btnBy.delete(id);
+  for (const id of [...keyBy.keys()]) if (id[0] !== "p") keyBy.delete(id);
+  syncButtons();
+  syncKeys();
+});
+
+// ------------------------------------------------------------------ screen and lights
+const ctx = document.getElementById("screen").getContext("2d");
+const img = ctx.createImageData(240, 240);
+function drawScreen(fb) {
+  const d = img.data;
+  for (let i = 0; i < 240 * 240; i++) {
+    const v = fb[i], p = ((v >> 8) | (v << 8)) & 0xFFFF;          // the panel's byte order -> RGB565
+    d[i * 4] = ((p >> 11) & 31) * 255 / 31;
+    d[i * 4 + 1] = ((p >> 5) & 63) * 255 / 63;
+    d[i * 4 + 2] = (p & 31) * 255 / 31;
+    d[i * 4 + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+// the power-on sweep (hal/fm1_led_anim.h): a level per LED, lit frames /64 (| 128: the glow under them), drawn as the
+// LED's share of lit between its dark (or glowing) colour and the lit one, mixed in linear light
+const lin = (h) => [1, 3, 5].map((i) => (parseInt(h.slice(i, i + 2), 16) / 255) ** 2.2);
+const ANIM = { btn: [lin("#3a3934"), lin("#3a3934"), lin("#fff4d6")], slit: [lin("#3a3a3c"), lin("#77777b"), lin("#ececee")] };
+function animFill(kind, q) {
+  const [dark, glow, lit] = ANIM[kind], s = Math.min(q & 127, 64) / 64, base = q & 128 ? glow : dark;
+  const c = base.map((v, i) => Math.round(255 * (v + (lit[i] - v) * s) ** (1 / 2.2)));
+  return `rgb(${c.join(",")})`;
+}
+function drawAnim(anim) {
+  for (const b of buttons) b.g.querySelector(".face").style.fill = anim ? animFill("btn", anim[b.bit]) : "";
+  keys.forEach((k, i) => { k.g.querySelector(".slit").style.fill = anim ? animFill("slit", anim[14 + i]) : ""; });
+}
+function drawLights([litB, litK, dimB, dimK, dimLo = 0, brB = 0, brK = 0, midK = 0], anim = null) {
+  drawAnim(anim);
+  document.documentElement.classList.toggle("dimlo", !!dimLo);   // (the breath's lower peak)
+  for (const b of buttons) {
+    const bit = 1 << b.bit, green = b.bit === B.PLAY && (litB & (1 << PLAY_GREEN));
+    b.g.classList.toggle("lit", !!(litB & bit) && !green);
+    b.g.classList.toggle("green", !!green);
+    b.g.classList.toggle("dim", !!(dimB & bit));
+    b.g.classList.toggle("breath", !!(brB & bit));
+  }
+  keys.forEach((k, i) => {
+    k.g.classList.toggle("lit", !!(litK & (1 << i)));
+    k.g.classList.toggle("dim", !!(dimK & (1 << i)));
+    k.g.classList.toggle("breath", !!(brK & (1 << i)));
+    k.g.classList.toggle("mid", !!(midK & (1 << i)));
+  });
+}
+
+
+
+// MultiSynth 1.1: compact touch controls routed to original JIANT functions.
+const msPiano=document.getElementById('ms-piano');
+const msKeys=[],msHeld=new Map();
+const msWindows=[0,4,8];
+let msWindowIndex=0;
+function msUpdate(){const active=new Set(msHeld.values());for(const k of msKeys)k.classList.toggle('pressed',active.has(Number(k.dataset.note)))}
+function msStop(id){if(msHeld.delete(id)){keyBy.delete('ms'+id);syncKeys();msUpdate()}}
+function msReleaseAll(){for(const id of [...msHeld.keys()])msStop(id)}
+function msBuildPiano(){
+ msReleaseAll();msPiano.replaceChildren();msKeys.length=0;
+ const whites=WHITE.slice(msWindows[msWindowIndex],msWindows[msWindowIndex]+8);
+ const low=whites[0],high=whites[whites.length-1];
+ whites.forEach((n,i)=>{const k=document.createElement('div');k.className='ms-white';k.dataset.note=n;k.setAttribute('aria-label','Nota '+keyName(n));
+ if(i===0||n%12===0){const label=document.createElement('span');label.className='ms-key-label';label.textContent=keyName(n);k.append(label)}msPiano.append(k);msKeys.push(k)});
+ BLACK.forEach(n=>{if(n<=low||n>=high)return;const after=whites.findIndex(w=>w>n)-1;if(after<0)return;
+ const k=document.createElement('div');k.className='ms-black';k.dataset.note=n;k.style.left=`calc(${(after+1)/whites.length*100}% - 2.9%)`;msPiano.append(k);msKeys.push(k)});
+ document.getElementById('ms-range-label').textContent=keyName(low)+' – '+keyName(high);
+ document.getElementById('ms-range-prev').disabled=msWindowIndex===0;
+ document.getElementById('ms-range-next').disabled=msWindowIndex===msWindows.length-1;msUpdate();
+}
+function msNoteAt(x,y){const r=msPiano.getBoundingClientRect();if(x<r.left||x>r.right||y<r.top||y>r.bottom)return null;
+ for(const k of msPiano.querySelectorAll('.ms-black')){const q=k.getBoundingClientRect();if(x>=q.left&&x<=q.right&&y>=q.top&&y<=q.bottom)return Number(k.dataset.note)}
+ const whites=msPiano.querySelectorAll('.ms-white');const i=Math.max(0,Math.min(whites.length-1,Math.floor((x-r.left)/r.width*whites.length)));return Number(whites[i].dataset.note)}
+msPiano.addEventListener('pointerdown',e=>{const n=msNoteAt(e.clientX,e.clientY);if(n===null)return;e.preventDefault();msPiano.setPointerCapture(e.pointerId);msHeld.set(e.pointerId,n);keyBy.set('ms'+e.pointerId,n);syncKeys();msUpdate()});
+msPiano.addEventListener('pointermove',e=>{if(!msHeld.has(e.pointerId))return;const n=msNoteAt(e.clientX,e.clientY);if(n===null){msStop(e.pointerId);return}if(n===msHeld.get(e.pointerId))return;msHeld.set(e.pointerId,n);keyBy.set('ms'+e.pointerId,n);syncKeys();msUpdate()});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])msPiano.addEventListener(type,e=>msStop(e.pointerId));
+document.getElementById('ms-range-prev').onclick=()=>{if(msWindowIndex>0){msWindowIndex--;msBuildPiano()}};
+document.getElementById('ms-range-next').onclick=()=>{if(msWindowIndex<msWindows.length-1){msWindowIndex++;msBuildPiano()}};
+msBuildPiano();
+function msButton(bit){if(bit===undefined)return;const id='v1btn'+Math.random();
+ btnBy.set(id,bit);syncButtons();setTimeout(()=>{btnBy.delete(id);syncButtons()},125)}
+document.getElementById('ms-octdown').onclick=()=>msButton(B['OCT-']);
+document.getElementById('ms-octup').onclick=()=>msButton(B['OCT+']);
+document.getElementById('ms-panic').onclick=()=>{msReleaseAll()};
+addEventListener('blur',()=>{msReleaseAll()});
+
+const v1Volume=document.getElementById('v1-volume');
+v1Volume.addEventListener('input',()=>{masterValue=Number(v1Volume.value);angle.MASTER=-135+270*masterValue/1023;
+ send({type:'master',value:masterValue});document.getElementById('v1-volume-value').textContent=Math.round(masterValue/1023*100)+'%';
+ const masterKnob=knobs.find(k=>k.name==='MASTER');if(masterKnob)drawKnob(masterKnob)});
+const v1Tabs=[...document.querySelectorAll('#v1-tabs button')];
+let v1Encoder='SELECT';
+function v1SetEncoder(name){v1Encoder=name;document.getElementById('v1-param').textContent=name;
+ for(const btn of v1Tabs)btn.classList.toggle('active',btn.dataset.encoder===name)}
+v1Tabs.forEach(b=>b.onclick=()=>v1SetEncoder(b.dataset.encoder));v1SetEncoder(v1Encoder);
+function v1Turn(n){const knob=knobs.find(k=>k.name===v1Encoder);if(knob)turn(knob,n)}
+document.getElementById('v1-minus').onclick=()=>v1Turn(-1);
+document.getElementById('v1-plus').onclick=()=>v1Turn(1);
+const v1Swipe=document.getElementById('v1-swipe');
+let v1Pointer=null,v1Last=0,v1Accum=0;
+v1Swipe.addEventListener('pointerdown',e=>{e.preventDefault();v1Pointer=e.pointerId;v1Last=e.clientX;v1Accum=0;v1Swipe.setPointerCapture(e.pointerId)});
+v1Swipe.addEventListener('pointermove',e=>{if(e.pointerId!==v1Pointer)return;e.preventDefault();v1Accum+=e.clientX-v1Last;v1Last=e.clientX;
+ const steps=Math.trunc(v1Accum/16);if(steps){v1Accum-=steps*16;v1Turn(Math.max(-12,Math.min(12,steps)))}});
+for(const event of ['pointerup','pointercancel','lostpointercapture'])v1Swipe.addEventListener(event,e=>{if(e.pointerId===v1Pointer)v1Pointer=null});
+v1Swipe.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();e.stopPropagation();v1Turn(e.key==='ArrowLeft'?-1:1)}});
+document.querySelectorAll('#v1-shortcuts button').forEach(btn=>{
+ const bit=B[btn.dataset.action];const id='v1'+btn.dataset.action;
+ const down=e=>{e.preventDefault();if(e.pointerId!==undefined)btn.setPointerCapture(e.pointerId);btnBy.set(id,bit);syncButtons();btn.classList.add('v1-held')};
+ const up=()=>{if(btnBy.delete(id))syncButtons();btn.classList.remove('v1-held')};
+ btn.addEventListener('pointerdown',down);
+ for(const type of ['pointerup','pointercancel','lostpointercapture'])btn.addEventListener(type,up);
+ btn.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Enter')&&!e.repeat){e.preventDefault();btnBy.set(id,bit);syncButtons()}});
+ btn.addEventListener('keyup',up);
+});
+const v1View=document.getElementById('v1-view');
+v1View.onclick=()=>{const panel=document.body.classList.toggle('v1-panel');
+ v1View.textContent=panel?'Vista directa':'Panel original';v1View.setAttribute('aria-pressed',String(panel))};
+document.getElementById('v1-piano-toggle').onclick=()=>{
+ const el=document.getElementById('ms-performance');el.hidden=!el.hidden;
+ document.body.classList.toggle('v1-no-piano',el.hidden);
+ document.getElementById('v1-piano-toggle').setAttribute('aria-pressed',String(!el.hidden));
+ if(el.hidden)msReleaseAll();
+};
+document.getElementById('ms-fullscreen').onclick=async()=>{try{
+ if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()
+}catch(e){console.warn('Pantalla completa no disponible',e)}};
+document.getElementById('v1-overlay').addEventListener('click',()=>document.getElementById('go').click());
+const v1Mirror=document.getElementById('v1-screen');
+const v1Ctx=v1Mirror.getContext('2d',{alpha:false});
+let v1DrawId=0;
+function v1MirrorFrame(){if(!document.hidden){v1Ctx.drawImage(canvas,0,0,240,240)}v1DrawId=requestAnimationFrame(v1MirrorFrame)}
+v1MirrorFrame();
+// ------------------------------------------------------------------ the flash, kept in this browser
+function loadFlash() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORE) || "{}"), out = {};
+    for (const [off, b64] of Object.entries(raw)) out[off] = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    return out;
+  } catch { return {}; }
+}
+function saveFlash(sectors) {
+  try {
+    const raw = {};
+    for (const [off, u8] of Object.entries(sectors)) {
+      let s = "";
+      for (let i = 0; i < u8.length; i += 4096) s += String.fromCharCode.apply(null, u8.subarray(i, i + 4096));
+      raw[off] = btoa(s);
+    }
+    localStorage.setItem(STORE, JSON.stringify(raw));
+    return true;
+  } catch { return false; }                                       // private mode, full: this session only
+}
+
+
+// v1.3: pad performance + independent Web Audio drum machine.
+// No claim that the JIANT WASM provides drums: all percussion below is synthesized separately.
+const msModes=[...document.querySelectorAll('.ms-mode button')];
+const msPadGrid=document.getElementById('ms-pad-grid');
+const msSeq=document.getElementById('ms-sequencer');
+const msRange=document.querySelector('.ms-range');
+let msMode='piano',msPadBank=0,msDrumAudio=null;
+const msDrumNames=['BOMBO','CAJA','CH HH','OP HH','CLAP','TOM L','TOM H','RIM','SHAKER','COW','CLICK','PERC','KICK 2','SNARE 2','HAT 2','TOM 2'];
+const msDrumMap=[36,38,42,46,39,41,45,37,70,56,75,54,35,40,44,47];
+const msDrumHeld=new Map(),msNoteHeld=new Map();
+function msDrumContext(){if(!msDrumAudio)msDrumAudio=new (window.AudioContext||window.webkitAudioContext)();if(msDrumAudio.state==='suspended')msDrumAudio.resume();return msDrumAudio}
+function msNoise(ctx,duration){const b=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),v=b.getChannelData(0);for(let i=0;i<v.length;i++)v[i]=Math.random()*2-1;return b}
+function msDrumPlay(i,when){const ac=msDrumContext();const t=when??ac.currentTime;const typ=i%12;
+ if([0,5,6,12,15].includes(i)){const osc=ac.createOscillator(),env=ac.createGain();osc.type='sine';const f=i===0||i===12?150:i===5?200:260;osc.frequency.setValueAtTime(f,t);osc.frequency.exponentialRampToValueAtTime(i===0||i===12?48:95,t+.15);env.gain.setValueAtTime(.65,t);env.gain.exponentialRampToValueAtTime(.001,t+.32);osc.connect(env).connect(ac.destination);osc.start(t);osc.stop(t+.34);return}
+ const src=ac.createBufferSource(),filter=ac.createBiquadFilter(),env=ac.createGain();src.buffer=msNoise(ac,.55);filter.type=typ===1||typ===4?'bandpass':'highpass';filter.frequency.value=typ===1||typ===4?1500:typ===9?900:6000;env.gain.setValueAtTime(typ===1||typ===4?.48:.22,t);env.gain.exponentialRampToValueAtTime(.001,t+(typ===3?.42:typ===1?.19:.075));src.connect(filter).connect(env).connect(ac.destination);src.start(t);src.stop(t+.55);
+}
+function msPadNote(i){return Math.min(26,Math.max(0,msPadBank*12+i))}
+function msPadRelease(id){const n=msNoteHeld.get(id);if(n!==undefined){msNoteHeld.delete(id);keyBy.delete('pad'+id);syncKeys()}const el=msDrumHeld.get(id);if(el){el.classList.remove('on');msDrumHeld.delete(id)}}
+function msPadPress(i,id,el){if(msMode==='drums'){msDrumPlay(i);el.classList.add('on');msDrumHeld.set(id,el)}else{const n=msPadNote(i);msNoteHeld.set(id,n);keyBy.set('pad'+id,n);syncKeys();el.classList.add('on');msDrumHeld.set(id,el)}}
+function msBuildPads(){msPadGrid.replaceChildren();document.getElementById('ms-pad-label').textContent=msMode==='drums'?'Percusión · 16 sonidos':(msPadBank===0?'Notas 1–16':'Notas 13–27');document.getElementById('ms-pad-prev').disabled=msMode==='drums'||msPadBank===0;document.getElementById('ms-pad-next').disabled=msMode==='drums'||msPadBank===1;for(let i=0;i<16;i++){const b=document.createElement('button');b.type='button';b.className='ms-pad';const n=msPadNote(i);b.innerHTML='<b>'+(i+1)+'</b><small>'+(msMode==='drums'?msDrumNames[i]:(n<=26?keyName(n):'—'))+'</small>';b.disabled=msMode==='pads'&&n>26;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);msPadPress(i,e.pointerId,b)});
+ for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,e=>msPadRelease(e.pointerId));msPadGrid.append(b)}}
+function msSetMode(mode){msReleaseAll();for(const id of [...msNoteHeld.keys(),...msDrumHeld.keys()])msPadRelease(id);msMode=mode;msModes.forEach(b=>{b.classList.toggle('selected',b.dataset.mode===mode);b.setAttribute('aria-pressed',String(b.dataset.mode===mode))});msPiano.hidden=mode!=='piano';msRange.hidden=mode!=='piano';msPadGrid.hidden=!['pads','drums'].includes(mode);document.getElementById('ms-pad-bank').hidden=msPadGrid.hidden;msSeq.hidden=mode!=='seq';if(!msPadGrid.hidden)msBuildPads()}
+msModes.forEach(b=>b.addEventListener('click',()=>msSetMode(b.dataset.mode)));document.getElementById('ms-pad-prev').onclick=()=>{msPadBank=0;msBuildPads()};document.getElementById('ms-pad-next').onclick=()=>{msPadBank=1;msBuildPads()};
+const msTracks=['BOMBO','CAJA','HH','CLAP'];const msTracksIndex=[0,1,2,4];const msPattern=Array.from({length:4},(_,r)=>Array.from({length:16},(_,c)=>r===0?c%4===0:r===1?c%8===4:r===2?c%2===0:false));
+const msRows=document.getElementById('ms-seq-rows');let msSeqRunning=false,msSeqTimer=null,msStep=0,msNextTime=0;
+function msRenderSeq(){msRows.replaceChildren();for(let r=0;r<4;r++){const row=document.createElement('div');row.className='ms-seq-row';const label=document.createElement('span');label.textContent=msTracks[r];row.append(label);for(let c=0;c<16;c++){const b=document.createElement('button');b.type='button';b.dataset.r=r;b.dataset.c=c;b.className=(msPattern[r][c]?'hit ':'')+(msSeqRunning&&c===msStep?'beat':'');b.setAttribute('aria-label',msTracks[r]+' paso '+(c+1));b.setAttribute('aria-pressed',String(msPattern[r][c]));b.onclick=()=>{msPattern[r][c]=!msPattern[r][c];msRenderSeq()};row.append(b)}msRows.append(row)}}
+function msSeqTick(){if(!msSeqRunning)return;const ac=msDrumContext();const bpm=Math.max(45,Math.min(240,Number(document.getElementById('ms-bpm').value)||110));const beat=60/bpm/4;const swing=Number(document.getElementById('ms-swing').value)/100;while(msNextTime<ac.currentTime+.09){const step=msStep;for(let r=0;r<4;r++)if(msPattern[r][step])msDrumPlay(msTracksIndex[r],msNextTime);msStep=(msStep+1)%16;msNextTime+=beat*(step%2===0?1+swing:1-swing)}msRenderSeq()}
+function msSeqStop(){msSeqRunning=false;clearInterval(msSeqTimer);msSeqTimer=null;document.getElementById('ms-seq-play').textContent='▶ Iniciar';msRenderSeq()}
+document.getElementById('ms-seq-play').onclick=()=>{if(msSeqRunning){msSeqStop();return}const ac=msDrumContext();msSeqRunning=true;msStep=0;msNextTime=ac.currentTime+.04;msSeqTimer=setInterval(msSeqTick,25);msSeqTick();document.getElementById('ms-seq-play').textContent='■ Detener'};
+document.getElementById('ms-seq-clear').onclick=()=>{msPattern.forEach(row=>row.fill(false));msRenderSeq()};
+// Launchkey: keyboard plays original JIANT via MIDI; pads can trigger drums on channel 10
+// (GM drum notes) or in the active Drums mode. Other MIDI messages pass unchanged.
+function msMidiReceive(d){const status=d[0]&0xf0,ch=d[0]&15,n=d[1],vel=d[2]||0;if(status!==0x90&&status!==0x80)return false;
+ if(ch!==9&&msMode!=='drums')return false;
+ const i=msDrumMap.indexOf(n);if(i<0)return ch===9;
+ if(status===0x90&&vel>0)msDrumPlay(i);return true;
+}
+msRenderSeq();msSetMode('piano');
+window.addEventListener('blur',()=>{for(const id of [...msNoteHeld.keys(),...msDrumHeld.keys()])msPadRelease(id)});
+
+// ------------------------------------------------------------------ Web MIDI in (channel messages)
+async function midiOn() {
+  if (!navigator.requestMIDIAccess) { document.getElementById("ms-midi-status").textContent="MIDI: navegador sin Web MIDI";return; }
+  try {
+    const access = await navigator.requestMIDIAccess();
+    const bind = () => {
+      document.getElementById("ms-midi-status").textContent = access.inputs.size ? "MIDI: " + [...access.inputs.values()].map(i=>i.name).join(", ") : "MIDI: conecta Launchkey por USB";
+      for (const input of access.inputs.values()) {
+        input.onmidimessage = (e) => {
+          const d = e.data;
+          if (d.length >= 2 && d[0] >= 0x80 && d[0] < 0xF0) { if (!msMidiReceive(d)) send({ type: "midi", data: [d[0], d[1], d[2] || 0] }); }
+        };
+      }
+    };
+    access.onstatechange = bind;
+    bind();
+  } catch { document.getElementById("ms-midi-status").textContent="MIDI: permiso no concedido"; }
+}
+
+// ------------------------------------------------------------------ switching on
+const status = document.getElementById("status");
+const say = (t) => { status.textContent = t; status.hidden = !t; };
+async function switchOn() {
+  const go = document.getElementById("go");
+  go.disabled = true;
+  go.textContent = "Starting…";
+  try {
+    const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
+    let sectors = loadFlash();
+    const [wasm] = await Promise.all([
+      fetch("felucca.wasm", { cache: "no-cache" }).then((r) => { if (!r.ok) throw new Error(`felucca.wasm: ${r.status}`); return r.arrayBuffer(); }),
+      ac.audioWorklet.addModule("worklet.js?v=" + Date.now())]);
+    node = new AudioWorkletNode(ac, "felucca", { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });
+    node.connect(ac.destination);
+    let warned = false;
+    await new Promise((res, rej) => {
+      node.port.onmessage = (e) => {
+        const m = e.data;
+        if (m.type === "ready") {
+          res();
+        }
+        else if (m.type === "error") {
+          say("Emulator stopped: " + m.message + ". Reload the page to restart.");
+          rej(new Error(m.message));
+        }
+        else if (m.type === "frame") {
+          if (m.fb) drawScreen(m.fb);
+          if (m.leds) drawLights(lastLeds = m.leds, m.anim);
+          if (m.sectors && !saveFlash(m.sectors) && !warned) {
+            warned = true;
+            console.warn("JIANT: this browser does not keep the saves; they last until the page closes.");
+          }
+        }
+      };
+      node.port.postMessage({ type: "load", wasm, sectors, master: masterValue }, [wasm]);
+    });
+    await ac.resume();
+    document.getElementById("start").hidden = true;
+    document.getElementById("v1-overlay").hidden = true;
+    go.textContent = "On";
+    if (ac.sampleRate !== 44100) console.warn(`JIANT: the browser plays at ${ac.sampleRate} Hz, the pitch is off by ${(1200 * Math.log2(ac.sampleRate / 44100)).toFixed(0)} cents.`);
+    syncButtons();
+    syncKeys();
+    send({ type: "visible", on: !document.hidden });
+    midiOn();
+  } catch (err) {
+    node = null;
+    go.disabled = false;
+    go.textContent = "Switch on";
+    say("Could not start: " + (err && err.message || err) + ". A current Chrome, Edge, Firefox or Safari should work.");
+  }
+}
+document.getElementById("go").addEventListener("click", switchOn);
+document.addEventListener("visibilitychange", () => send({ type: "visible", on: !document.hidden }));
+
+// MultiSynth 1.4: UI orchestration without replacing the original JIANT audio engine.
+const ms14Nav=[...document.querySelectorAll('.ms14-nav button')];
+const ms14LayoutButton=document.getElementById('ms14-layout');
+const ms14HelpPanel=document.getElementById('ms14-help-panel');
+const ms14Pages=['play','pads','drums','seq','edit','presets','fx','original'];
+let ms14Page='play',ms14Layout='auto';
+try{const saved=localStorage.getItem('ms14-layout');if(['auto','mobile','desktop'].includes(saved))ms14Layout=saved}catch{}
+function ms14ApplyLayout(){
+ document.body.classList.remove('ms14-mobile','ms14-desktop');
+ const useMobile=ms14Layout==='mobile'||(ms14Layout==='auto'&&matchMedia('(max-width:750px)').matches);
+ document.body.classList.add(useMobile?'ms14-mobile':'ms14-desktop');
+ ms14LayoutButton.textContent=ms14Layout==='auto'?'Auto':ms14Layout==='mobile'?'Móvil':'PC';
+ ms14LayoutButton.setAttribute('aria-label','Diseño: '+ms14Layout+'. Pulsar para cambiar');
+}
+function ms14Navigate(page){
+ if(!ms14Pages.includes(page))return;
+ ms14Page=page;
+ document.body.classList.remove(...ms14Pages.map(p=>'ms14-'+p),'v1-panel','v1-no-piano');
+ document.body.classList.add('ms14-'+page);
+ ms14Nav.forEach(b=>b.setAttribute('aria-selected',String(b.dataset.page===page)));
+ if(page==='original')document.body.classList.add('ms14-original');
+ if(['play','pads','drums','seq'].includes(page)){
+  const modes={play:'piano',pads:'pads',drums:'drums',seq:'seq'};
+  msSetMode(modes[page]);
+ }else{
+  msReleaseAll();
+  if(page==='presets')v1SetEncoder('PRESETS');
+  if(page==='fx'){v1SetEncoder('KNOB 1');}
+ }
+}
+ms14Nav.forEach(b=>b.addEventListener('click',()=>ms14Navigate(b.dataset.page)));
+ms14LayoutButton.addEventListener('click',()=>{
+ ms14Layout=ms14Layout==='auto'?'mobile':ms14Layout==='mobile'?'desktop':'auto';
+ try{localStorage.setItem('ms14-layout',ms14Layout)}catch{}
+ ms14ApplyLayout();
+});
+window.addEventListener('resize',()=>{if(ms14Layout==='auto')ms14ApplyLayout()},{passive:true});
+document.getElementById('ms14-help').onclick=()=>{ms14HelpPanel.hidden=!ms14HelpPanel.hidden};
+document.getElementById('ms14-close-help').onclick=()=>{ms14HelpPanel.hidden=true};
+const ms14Dial=document.getElementById('v1-swipe');
+ms14Dial.setAttribute('aria-label','Encoder: rueda de ratón, arrastre o flechas');
+ms14Dial.addEventListener('wheel',e=>{e.preventDefault();v1Turn(e.deltaY>0?-1:1)},{passive:false});
+ms14Dial.addEventListener('dblclick',e=>{e.preventDefault();v1Turn(1)});
+document.getElementById('v1-screen').addEventListener('wheel',e=>{e.preventDefault();v1Turn(e.deltaY>0?-1:1)},{passive:false});
+document.getElementById('ms14-start').onclick=()=>{
+ document.getElementById('ms14-bootmsg').textContent='Cargando motor de audio…';
+ document.getElementById('go').click();
+};
+const ms14Status=document.getElementById('ms14-status');
+const ms14StatusObserver=new MutationObserver(()=>{
+ if(document.getElementById('start').hidden){ms14Status.hidden=true;ms14StatusObserver.disconnect()}
+ else if(!document.getElementById('status').hidden){
+  document.getElementById('ms14-bootmsg').textContent=document.getElementById('status').textContent;
+  document.getElementById('ms14-start').disabled=false;
+ }
+});
+ms14StatusObserver.observe(document.getElementById('start'),{attributes:true,subtree:true,childList:true,characterData:true});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)msReleaseAll()});
+ms14ApplyLayout();ms14Navigate('play');
+
+</script>
+</body>
+</html>
+
