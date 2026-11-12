@@ -252,10 +252,42 @@ button:focus-visible,.v1-swipe:focus-visible{outline:2px solid #9fe6c9;outline-o
  .v1-master input{min-height:22px}
  .v1-screenbox{height:min(100%,calc(100dvh - 150px))}
 }
+
+/* 1.2 keyboard navigation */
+.ms-range{display:flex;align-items:center;justify-content:center;gap:9px;min-height:28px;margin:2px 0 4px;color:#d8ece6;font-size:12px;font-weight:700}
+.ms-range button{min-width:43px;min-height:29px;padding:3px 9px;background:#283e47}
+.ms-range button:disabled{opacity:.28}.ms-range span{min-width:105px;text-align:center}
+.ms-key-label{position:absolute;bottom:6px;left:3px;font-size:10px;color:#43525b;pointer-events:none}.ms-white{position:relative}
+.v1-shortcuts button,.v1-tabs button,.ms-performance button{border-radius:8px}
+.ms-piano{height:clamp(105px,23dvh,190px)}
+@media (orientation:portrait) and (max-width:700px){.ms-piano{height:clamp(105px,22dvh,180px)}.v1-screenbox{height:min(100%,calc(100dvh - 435px))}}
+@media (orientation:landscape) and (max-height:530px){.ms-range{min-height:22px;margin:0 0 2px;font-size:10px}.ms-range button{min-height:23px}.ms-piano{height:clamp(65px,22dvh,125px)}.v1-screenbox{height:min(100%,calc(100dvh - 165px))}}
+
+/* v1.3: independent performance modes, touch-first */
+.ms-mode{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-bottom:4px}
+.ms-mode button{min-height:34px!important;padding:3px!important;font-size:10px!important;letter-spacing:.03em}
+.ms-mode button.selected{background:#2c8179!important;border-color:#76c8bb!important;color:white}
+.ms-pad-bank{display:flex;align-items:center;justify-content:space-between;margin:2px 0 5px}.ms-pad-bank button{min-height:27px!important}.ms-pad-bank span{font-size:11px}.ms-pad-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;height:clamp(150px,30dvh,285px);touch-action:none}
+.ms-pad-bank[hidden],.ms-pad-grid[hidden],.ms-sequencer[hidden],.ms-piano[hidden],.ms-range[hidden]{display:none!important}
+.ms-pad{border:1px solid #698c94!important;background:#2b4c5b!important;border-radius:11px!important;touch-action:none!important;user-select:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:0!important;font-size:13px!important}
+.ms-pad:nth-child(4n+2){background:#354866!important}.ms-pad:nth-child(4n+3){background:#3d4666!important}
+.ms-pad.on{background:#269e8a!important;box-shadow:inset 0 0 0 2px #a1f7e6}
+.ms-pad small{font-size:9px;opacity:.8}
+.ms-transport{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:7px}
+.ms-transport input[type=number]{width:53px;background:#1b2833;color:white;border:1px solid #61717b;border-radius:5px;padding:4px}
+.ms-transport input[type=range]{width:65px;vertical-align:middle}
+.ms-transport label{font-size:11px}
+.ms-seq-rows{display:grid;gap:3px}
+.ms-seq-row{display:grid;grid-template-columns:42px repeat(16,minmax(0,1fr));gap:2px;align-items:center}
+.ms-seq-row>span{font-size:10px;white-space:nowrap}
+.ms-seq-row button{min-width:0;min-height:24px!important;padding:0!important;border-radius:4px!important;background:#293744!important}
+.ms-seq-row button.hit{background:#269e8a!important}.ms-seq-row button.beat{outline:2px solid #e6ce73}
+.ms-midi-status{font-size:10px;opacity:.7;text-align:center;padding-top:3px}
+@media(max-height:530px) and (orientation:landscape){.ms-pad-grid{height:clamp(65px,25dvh,145px)}.ms-mode button{min-height:23px!important}.ms-midi-status{display:none}.ms-seq-row button{min-height:17px!important}}
 </style>
 </head>
 <body>
-<header class="v1-header"><div class="v1-brand"><b>JIANT</b><span>MultiSynth 1.1</span></div><div class="v1-actions"><button id="v1-view" aria-pressed="false">Original</button><button id="v1-piano-toggle">Teclas</button><button id="ms-fullscreen" title="Pantalla completa" aria-label="Pantalla completa">⛶</button></div></header>
+<header class="v1-header"><div class="v1-brand"><b>JIANT</b><span>MultiSynth 1.3</span></div><div class="v1-actions"><button id="v1-view" aria-pressed="false">Original</button><button id="v1-piano-toggle">Teclas</button><button id="ms-fullscreen" title="Pantalla completa" aria-label="Pantalla completa">⛶</button></div></header>
 <section id="v1-stage" class="v1-stage">
   <div class="v1-screenbox"><canvas id="v1-screen" width="240" height="240" aria-label="Visualización original de JIANT"></canvas><div id="v1-overlay" class="v1-overlay">Pulsa «Switch on» para activar JIANT</div></div>
   <div class="v1-controls">
@@ -265,7 +297,7 @@ button:focus-visible,.v1-swipe:focus-visible{outline:2px solid #9fe6c9;outline-o
 <div class="v1-master"><label for="v1-volume">MASTER</label><input id="v1-volume" type="range" min="0" max="1023" value="700" step="1" aria-label="Volumen maestro"><span id="v1-volume-value">68%</span></div>
   </div>
 </section>
-<section class="ms-performance" id="ms-performance"><div class="ms-performance-head"><strong>TECLADO</strong><div><button type="button" id="ms-octdown">− OCT</button><button type="button" id="ms-octup">+ OCT</button><button type="button" id="ms-panic">SOLTAR</button></div></div><div class="ms-piano" id="ms-piano" aria-label="Piano táctil polifónico"></div></section>
+<section class="ms-performance" id="ms-performance"><div class="ms-performance-head"><strong>TECLADO</strong><div><button type="button" id="ms-octdown">− OCT</button><button type="button" id="ms-octup">+ OCT</button><button type="button" id="ms-panic">SOLTAR</button></div></div><div class="ms-mode"><button data-mode="piano" class="selected">PIANO</button><button data-mode="pads">PADS</button><button data-mode="drums">DRUMS</button><button data-mode="seq">SECUENCIADOR</button></div><div class="ms-range"><button type="button" id="ms-range-prev" aria-label="Notas más graves">◀</button><span id="ms-range-label">F3 – G5</span><button type="button" id="ms-range-next" aria-label="Notas más agudas">▶</button></div><div class="ms-piano" id="ms-piano" aria-label="Piano táctil polifónico"></div><div class="ms-pad-bank" id="ms-pad-bank" hidden><button id="ms-pad-prev">◀ Banco</button><span id="ms-pad-label">Notas 1–16</span><button id="ms-pad-next">Banco ▶</button></div><div class="ms-pad-grid" id="ms-pad-grid" hidden></div><div class="ms-sequencer" id="ms-sequencer" hidden><div class="ms-transport"><button id="ms-seq-play">▶ Iniciar</button><button id="ms-seq-clear">Borrar</button><label>BPM <input id="ms-bpm" type="number" min="45" max="240" value="110"></label><label>Swing <input id="ms-swing" type="range" min="0" max="65" value="0"></label></div><div class="ms-seq-rows" id="ms-seq-rows"></div></div><div class="ms-midi-status" id="ms-midi-status">MIDI: pendiente de conectar</div></section>
 <section class="ms-edit" id="ms-edit"><div class="ms-edit-head"><strong>Ajuste de encoder</strong><select id="ms-encoder" aria-label="Seleccionar encoder"></select><button type="button" id="ms-closeedit">✕</button></div><div class="ms-controls" id="ms-controls"></div><small>Los ajustes son relativos, como en los encoders físicos.</small></section>
 
 <main>
@@ -606,42 +638,39 @@ function drawLights([litB, litK, dimB, dimK, dimLo = 0, brB = 0, brK = 0, midK =
 
 // MultiSynth 1.1: compact touch controls routed to original JIANT functions.
 const msPiano=document.getElementById('ms-piano');
-const msKeys=[];
-for(let i=0;i<WHITE.length;i++){
-  const key=document.createElement('div');key.className='ms-white';key.dataset.note=WHITE[i];
-  key.setAttribute('aria-label','Nota '+keyName(WHITE[i]));msPiano.append(key);msKeys.push(key);
-}
-BLACK.forEach((n,i)=>{const key=document.createElement('div');key.className='ms-black';key.dataset.note=n;
- key.style.left=`calc(${(BLACK_AFTER[i]+1)/WHITE.length*100}% - 2.15%)`;msPiano.append(key);msKeys.push(key)});
-const msHeld=new Map();
-let msGlide=true;
-
-function msUpdate(){const active=new Set(msHeld.values());for(const el of msKeys)el.classList.toggle('pressed',active.has(Number(el.dataset.note)))}
+const msKeys=[],msHeld=new Map();
+const msWindows=[0,4,8];
+let msWindowIndex=0;
+function msUpdate(){const active=new Set(msHeld.values());for(const k of msKeys)k.classList.toggle('pressed',active.has(Number(k.dataset.note)))}
 function msStop(id){if(msHeld.delete(id)){keyBy.delete('ms'+id);syncKeys();msUpdate()}}
-function msNoteAt(x,y){
- const rect=msPiano.getBoundingClientRect();
- if(x<rect.left||x>rect.right||y<rect.top||y>rect.bottom)return null;
- // Coordinate hit test works even with pointer capture, and prioritizes black keys.
- const localX=x-rect.left,localY=y-rect.top;
- for(const k of msPiano.querySelectorAll('.ms-black')){
-  const r=k.getBoundingClientRect();
-  if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return Number(k.dataset.note);
- }
- const whites=msPiano.querySelectorAll('.ms-white');
- const index=Math.max(0,Math.min(whites.length-1,Math.floor(localX/rect.width*whites.length)));
- return Number(whites[index].dataset.note);
+function msReleaseAll(){for(const id of [...msHeld.keys()])msStop(id)}
+function msBuildPiano(){
+ msReleaseAll();msPiano.replaceChildren();msKeys.length=0;
+ const whites=WHITE.slice(msWindows[msWindowIndex],msWindows[msWindowIndex]+8);
+ const low=whites[0],high=whites[whites.length-1];
+ whites.forEach((n,i)=>{const k=document.createElement('div');k.className='ms-white';k.dataset.note=n;k.setAttribute('aria-label','Nota '+keyName(n));
+ if(i===0||n%12===0){const label=document.createElement('span');label.className='ms-key-label';label.textContent=keyName(n);k.append(label)}msPiano.append(k);msKeys.push(k)});
+ BLACK.forEach(n=>{if(n<=low||n>=high)return;const after=whites.findIndex(w=>w>n)-1;if(after<0)return;
+ const k=document.createElement('div');k.className='ms-black';k.dataset.note=n;k.style.left=`calc(${(after+1)/whites.length*100}% - 2.9%)`;msPiano.append(k);msKeys.push(k)});
+ document.getElementById('ms-range-label').textContent=keyName(low)+' – '+keyName(high);
+ document.getElementById('ms-range-prev').disabled=msWindowIndex===0;
+ document.getElementById('ms-range-next').disabled=msWindowIndex===msWindows.length-1;msUpdate();
 }
-msPiano.addEventListener('pointerdown',e=>{const n=msNoteAt(e.clientX,e.clientY);if(n===null)return;
- e.preventDefault();msPiano.setPointerCapture(e.pointerId);msHeld.set(e.pointerId,n);keyBy.set('ms'+e.pointerId,n);syncKeys();msUpdate()});
-msPiano.addEventListener('pointermove',e=>{if(!msHeld.has(e.pointerId))return;const n=msNoteAt(e.clientX,e.clientY);
- if(n===null){msStop(e.pointerId);return}if(n===msHeld.get(e.pointerId))return;msHeld.set(e.pointerId,n);keyBy.set('ms'+e.pointerId,n);syncKeys();msUpdate()});
+function msNoteAt(x,y){const r=msPiano.getBoundingClientRect();if(x<r.left||x>r.right||y<r.top||y>r.bottom)return null;
+ for(const k of msPiano.querySelectorAll('.ms-black')){const q=k.getBoundingClientRect();if(x>=q.left&&x<=q.right&&y>=q.top&&y<=q.bottom)return Number(k.dataset.note)}
+ const whites=msPiano.querySelectorAll('.ms-white');const i=Math.max(0,Math.min(whites.length-1,Math.floor((x-r.left)/r.width*whites.length)));return Number(whites[i].dataset.note)}
+msPiano.addEventListener('pointerdown',e=>{const n=msNoteAt(e.clientX,e.clientY);if(n===null)return;e.preventDefault();msPiano.setPointerCapture(e.pointerId);msHeld.set(e.pointerId,n);keyBy.set('ms'+e.pointerId,n);syncKeys();msUpdate()});
+msPiano.addEventListener('pointermove',e=>{if(!msHeld.has(e.pointerId))return;const n=msNoteAt(e.clientX,e.clientY);if(n===null){msStop(e.pointerId);return}if(n===msHeld.get(e.pointerId))return;msHeld.set(e.pointerId,n);keyBy.set('ms'+e.pointerId,n);syncKeys();msUpdate()});
 for(const type of ['pointerup','pointercancel','lostpointercapture'])msPiano.addEventListener(type,e=>msStop(e.pointerId));
+document.getElementById('ms-range-prev').onclick=()=>{if(msWindowIndex>0){msWindowIndex--;msBuildPiano()}};
+document.getElementById('ms-range-next').onclick=()=>{if(msWindowIndex<msWindows.length-1){msWindowIndex++;msBuildPiano()}};
+msBuildPiano();
 function msButton(bit){if(bit===undefined)return;const id='v1btn'+Math.random();
  btnBy.set(id,bit);syncButtons();setTimeout(()=>{btnBy.delete(id);syncButtons()},125)}
 document.getElementById('ms-octdown').onclick=()=>msButton(B['OCT-']);
 document.getElementById('ms-octup').onclick=()=>msButton(B['OCT+']);
-document.getElementById('ms-panic').onclick=()=>{for(const id of [...msHeld.keys()])msStop(id)};
-addEventListener('blur',()=>{for(const id of [...msHeld.keys()])msStop(id)});
+document.getElementById('ms-panic').onclick=()=>{msReleaseAll()};
+addEventListener('blur',()=>{msReleaseAll()});
 
 const v1Volume=document.getElementById('v1-volume');
 v1Volume.addEventListener('input',()=>{masterValue=Number(v1Volume.value);angle.MASTER=-135+270*masterValue/1023;
@@ -678,7 +707,7 @@ document.getElementById('v1-piano-toggle').onclick=()=>{
  const el=document.getElementById('ms-performance');el.hidden=!el.hidden;
  document.body.classList.toggle('v1-no-piano',el.hidden);
  document.getElementById('v1-piano-toggle').setAttribute('aria-pressed',String(!el.hidden));
- if(el.hidden)for(const id of [...msHeld.keys()])msStop(id);
+ if(el.hidden)msReleaseAll();
 };
 document.getElementById('ms-fullscreen').onclick=async()=>{try{
  if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()
@@ -710,22 +739,65 @@ function saveFlash(sectors) {
   } catch { return false; }                                       // private mode, full: this session only
 }
 
+
+// v1.3: pad performance + independent Web Audio drum machine.
+// No claim that the JIANT WASM provides drums: all percussion below is synthesized separately.
+const msModes=[...document.querySelectorAll('.ms-mode button')];
+const msPadGrid=document.getElementById('ms-pad-grid');
+const msSeq=document.getElementById('ms-sequencer');
+const msRange=document.querySelector('.ms-range');
+let msMode='piano',msPadBank=0,msDrumAudio=null;
+const msDrumNames=['BOMBO','CAJA','CH HH','OP HH','CLAP','TOM L','TOM H','RIM','SHAKER','COW','CLICK','PERC','KICK 2','SNARE 2','HAT 2','TOM 2'];
+const msDrumMap=[36,38,42,46,39,41,45,37,70,56,75,54,35,40,44,47];
+const msDrumHeld=new Map(),msNoteHeld=new Map();
+function msDrumContext(){if(!msDrumAudio)msDrumAudio=new (window.AudioContext||window.webkitAudioContext)();if(msDrumAudio.state==='suspended')msDrumAudio.resume();return msDrumAudio}
+function msNoise(ctx,duration){const b=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),v=b.getChannelData(0);for(let i=0;i<v.length;i++)v[i]=Math.random()*2-1;return b}
+function msDrumPlay(i,when){const ac=msDrumContext();const t=when??ac.currentTime;const typ=i%12;
+ if([0,5,6,12,15].includes(i)){const osc=ac.createOscillator(),env=ac.createGain();osc.type='sine';const f=i===0||i===12?150:i===5?200:260;osc.frequency.setValueAtTime(f,t);osc.frequency.exponentialRampToValueAtTime(i===0||i===12?48:95,t+.15);env.gain.setValueAtTime(.65,t);env.gain.exponentialRampToValueAtTime(.001,t+.32);osc.connect(env).connect(ac.destination);osc.start(t);osc.stop(t+.34);return}
+ const src=ac.createBufferSource(),filter=ac.createBiquadFilter(),env=ac.createGain();src.buffer=msNoise(ac,.55);filter.type=typ===1||typ===4?'bandpass':'highpass';filter.frequency.value=typ===1||typ===4?1500:typ===9?900:6000;env.gain.setValueAtTime(typ===1||typ===4?.48:.22,t);env.gain.exponentialRampToValueAtTime(.001,t+(typ===3?.42:typ===1?.19:.075));src.connect(filter).connect(env).connect(ac.destination);src.start(t);src.stop(t+.55);
+}
+function msPadNote(i){return Math.min(26,Math.max(0,msPadBank*12+i))}
+function msPadRelease(id){const n=msNoteHeld.get(id);if(n!==undefined){msNoteHeld.delete(id);keyBy.delete('pad'+id);syncKeys()}const el=msDrumHeld.get(id);if(el){el.classList.remove('on');msDrumHeld.delete(id)}}
+function msPadPress(i,id,el){if(msMode==='drums'){msDrumPlay(i);el.classList.add('on');msDrumHeld.set(id,el)}else{const n=msPadNote(i);msNoteHeld.set(id,n);keyBy.set('pad'+id,n);syncKeys();el.classList.add('on');msDrumHeld.set(id,el)}}
+function msBuildPads(){msPadGrid.replaceChildren();document.getElementById('ms-pad-label').textContent=msMode==='drums'?'Percusión · 16 sonidos':(msPadBank===0?'Notas 1–16':'Notas 13–27');document.getElementById('ms-pad-prev').disabled=msMode==='drums'||msPadBank===0;document.getElementById('ms-pad-next').disabled=msMode==='drums'||msPadBank===1;for(let i=0;i<16;i++){const b=document.createElement('button');b.type='button';b.className='ms-pad';const n=msPadNote(i);b.innerHTML='<b>'+(i+1)+'</b><small>'+(msMode==='drums'?msDrumNames[i]:(n<=26?keyName(n):'—'))+'</small>';b.disabled=msMode==='pads'&&n>26;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);msPadPress(i,e.pointerId,b)});
+ for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,e=>msPadRelease(e.pointerId));msPadGrid.append(b)}}
+function msSetMode(mode){msReleaseAll();for(const id of [...msNoteHeld.keys(),...msDrumHeld.keys()])msPadRelease(id);msMode=mode;msModes.forEach(b=>{b.classList.toggle('selected',b.dataset.mode===mode);b.setAttribute('aria-pressed',String(b.dataset.mode===mode))});msPiano.hidden=mode!=='piano';msRange.hidden=mode!=='piano';msPadGrid.hidden=!['pads','drums'].includes(mode);document.getElementById('ms-pad-bank').hidden=msPadGrid.hidden;msSeq.hidden=mode!=='seq';if(!msPadGrid.hidden)msBuildPads()}
+msModes.forEach(b=>b.addEventListener('click',()=>msSetMode(b.dataset.mode)));document.getElementById('ms-pad-prev').onclick=()=>{msPadBank=0;msBuildPads()};document.getElementById('ms-pad-next').onclick=()=>{msPadBank=1;msBuildPads()};
+const msTracks=['BOMBO','CAJA','HH','CLAP'];const msTracksIndex=[0,1,2,4];const msPattern=Array.from({length:4},(_,r)=>Array.from({length:16},(_,c)=>r===0?c%4===0:r===1?c%8===4:r===2?c%2===0:false));
+const msRows=document.getElementById('ms-seq-rows');let msSeqRunning=false,msSeqTimer=null,msStep=0,msNextTime=0;
+function msRenderSeq(){msRows.replaceChildren();for(let r=0;r<4;r++){const row=document.createElement('div');row.className='ms-seq-row';const label=document.createElement('span');label.textContent=msTracks[r];row.append(label);for(let c=0;c<16;c++){const b=document.createElement('button');b.type='button';b.dataset.r=r;b.dataset.c=c;b.className=(msPattern[r][c]?'hit ':'')+(msSeqRunning&&c===msStep?'beat':'');b.setAttribute('aria-label',msTracks[r]+' paso '+(c+1));b.setAttribute('aria-pressed',String(msPattern[r][c]));b.onclick=()=>{msPattern[r][c]=!msPattern[r][c];msRenderSeq()};row.append(b)}msRows.append(row)}}
+function msSeqTick(){if(!msSeqRunning)return;const ac=msDrumContext();const bpm=Math.max(45,Math.min(240,Number(document.getElementById('ms-bpm').value)||110));const beat=60/bpm/4;const swing=Number(document.getElementById('ms-swing').value)/100;while(msNextTime<ac.currentTime+.09){const step=msStep;for(let r=0;r<4;r++)if(msPattern[r][step])msDrumPlay(msTracksIndex[r],msNextTime);msStep=(msStep+1)%16;msNextTime+=beat*(step%2===0?1+swing:1-swing)}msRenderSeq()}
+function msSeqStop(){msSeqRunning=false;clearInterval(msSeqTimer);msSeqTimer=null;document.getElementById('ms-seq-play').textContent='▶ Iniciar';msRenderSeq()}
+document.getElementById('ms-seq-play').onclick=()=>{if(msSeqRunning){msSeqStop();return}const ac=msDrumContext();msSeqRunning=true;msStep=0;msNextTime=ac.currentTime+.04;msSeqTimer=setInterval(msSeqTick,25);msSeqTick();document.getElementById('ms-seq-play').textContent='■ Detener'};
+document.getElementById('ms-seq-clear').onclick=()=>{msPattern.forEach(row=>row.fill(false));msRenderSeq()};
+// Launchkey: keyboard plays original JIANT via MIDI; pads can trigger drums on channel 10
+// (GM drum notes) or in the active Drums mode. Other MIDI messages pass unchanged.
+function msMidiReceive(d){const status=d[0]&0xf0,ch=d[0]&15,n=d[1],vel=d[2]||0;if(status!==0x90&&status!==0x80)return false;
+ if(ch!==9&&msMode!=='drums')return false;
+ const i=msDrumMap.indexOf(n);if(i<0)return ch===9;
+ if(status===0x90&&vel>0)msDrumPlay(i);return true;
+}
+msRenderSeq();msSetMode('piano');
+window.addEventListener('blur',()=>{for(const id of [...msNoteHeld.keys(),...msDrumHeld.keys()])msPadRelease(id)});
+
 // ------------------------------------------------------------------ Web MIDI in (channel messages)
 async function midiOn() {
-  if (!navigator.requestMIDIAccess) return;
+  if (!navigator.requestMIDIAccess) { document.getElementById("ms-midi-status").textContent="MIDI: navegador sin Web MIDI";return; }
   try {
     const access = await navigator.requestMIDIAccess();
     const bind = () => {
+      document.getElementById("ms-midi-status").textContent = access.inputs.size ? "MIDI: " + [...access.inputs.values()].map(i=>i.name).join(", ") : "MIDI: conecta Launchkey por USB";
       for (const input of access.inputs.values()) {
         input.onmidimessage = (e) => {
           const d = e.data;
-          if (d.length >= 2 && d[0] >= 0x80 && d[0] < 0xF0) send({ type: "midi", data: [d[0], d[1], d[2] || 0] });
+          if (d.length >= 2 && d[0] >= 0x80 && d[0] < 0xF0) { if (!msMidiReceive(d)) send({ type: "midi", data: [d[0], d[1], d[2] || 0] }); }
         };
       }
     };
     access.onstatechange = bind;
     bind();
-  } catch { /* no permission: the panel only */ }
+  } catch { document.getElementById("ms-midi-status").textContent="MIDI: permiso no concedido"; }
 }
 
 // ------------------------------------------------------------------ switching on
