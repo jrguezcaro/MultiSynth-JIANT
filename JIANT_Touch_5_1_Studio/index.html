@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#202e27"><title>JIANT Touch 5.0 · Instrumento táctil</title><style>
+:root{color-scheme:dark;--background:#131c17;--panel:#293c31;--panel-light:#526b57;--panel-mid:#374e3f;--light:#dbe4d6;--muted:#a4b9a6;--phosphor:#b7efac;--amber:#e7b56b;--line:#516958;--shadow:#09100c;--red:#ce8167;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--background);color:var(--light);overflow:hidden;font-size:14px}button,input,select{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--phosphor);outline-offset:3px}button:disabled{opacity:.36;cursor:default}[hidden]{display:none!important}.app{height:100dvh;min-height:380px;display:grid;grid-template-rows:76px minmax(0,1fr);background:radial-gradient(circle at 50% -40%,#34513c,#17251d 65%,#111914);overflow:hidden}.topbar{display:flex;align-items:center;gap:clamp(14px,2vw,36px);padding:0 clamp(12px,2.1vw,32px);background:#1e2c23;border-bottom:1px solid #50644f;box-shadow:0 6px 18px #0003;position:relative;z-index:5}.brand{display:flex;align-items:center;gap:12px;white-space:nowrap}.brand-mark{width:44px;height:44px;background:#718a72;color:#17291f;border:2px solid #91a88e;display:grid;place-items:center;border-radius:10px;font-size:27px;box-shadow:inset 0 -4px 0 #354b3b,0 3px 8px #0006}.brand-name{display:grid;font-size:clamp(14px,1.1vw,18px);font-weight:750;letter-spacing:.09em;line-height:1.1}.brand-name strong{color:var(--phosphor);display:inline}.brand-name small{margin-top:7px;font-size:9px;letter-spacing:.2em;color:var(--muted);font-weight:600}.mainnav{display:flex;align-self:stretch;gap:5px;margin:auto;align-items:center}.nav{height:50px;border:1px solid transparent;background:transparent;color:#9aaf9e;padding:0 21px;border-radius:8px;font-size:12px;letter-spacing:.08em;font-weight:700}.nav span{margin-left:7px}.nav:hover{background:#304536;color:var(--light)}.nav.active{background:#54735c;color:#f1f7e9;box-shadow:inset 0 -3px 0 var(--phosphor);border-color:#6f9377}.header-actions{display:flex;align-items:center;gap:10px}.status-lamp,.led{height:9px;width:9px;border-radius:50%;background:#667267;border:1px solid #d0d4b8;display:inline-block;flex:none}.status-lamp.on,.led.alive{background:var(--phosphor);box-shadow:0 0 10px #95ee8d,0 0 3px #adffb5}.small-btn{min-height:40px;border-radius:8px;padding:8px 14px;background:#354a3d;border:1px solid #758e76;color:#e5f0e2;font-size:11px;font-weight:750;letter-spacing:.055em;white-space:nowrap}.small-btn:hover{background:#4b6752}.small-btn.emphasis{background:#607b62;color:#f9fff2}.workspace{min-height:0;padding:clamp(12px,2.3vh,28px) clamp(14px,3.4vw,66px) clamp(12px,3vh,34px)}.view{height:100%;min-height:0;display:flex;flex-direction:column;gap:clamp(10px,1.8vh,20px)}.panel-heading{display:flex;align-items:center;justify-content:space-between;min-height:66px;gap:12px}.eyebrow{font-size:10px;letter-spacing:.26em;color:var(--amber);font-weight:750}.panel-heading h1{margin:7px 0 0;font-size:clamp(17px,2.1vw,32px);line-height:1.1;letter-spacing:-.025em;font-weight:500}.head-controls,.tool-cluster{display:flex;align-items:center;gap:9px}.mini-control{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:800;letter-spacing:.07em;color:var(--muted);white-space:nowrap}.mini-control select,.mini-control input[type=number]{background:#1c2b21;color:var(--phosphor);border:1px solid #748976;border-radius:7px;padding:10px;min-height:40px;font-size:12px;font-weight:800}.play-frame,.sequence-frame{flex:1;min-height:0;min-width:0;padding:clamp(14px,2vw,30px);border-radius:19px;background:linear-gradient(145deg,#627b62,#415a49 35%,#30483a);border:2px solid #7d997f;box-shadow:inset 0 3px 1px #a0b39a44,inset 0 -9px 0 #1c3328,0 12px 25px #0006;display:flex;flex-direction:column;gap:13px}.play-tools,.play-bottom,.seq-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#e5f3dd;font-size:10px;letter-spacing:.1em;font-weight:800}.play-tools{min-height:48px}.metal-dot{width:10px;height:10px;background:radial-gradient(circle at 30% 30%,#f5f1d7,#687d6b 65%,#1c3025);border-radius:50%;box-shadow:0 1px 3px #15291e}.tinyline{height:1px;width:30px;background:#9db6a0}.round-btn{height:43px;min-width:44px;border:1px solid #1c3328;border-radius:10px;background:linear-gradient(#334c3f,#22382d);color:#f1f5e3;font-size:13px;font-weight:800;box-shadow:0 3px 0 #102219,0 2px 8px #0004}.round-btn:active{transform:translateY(2px);box-shadow:0 1px 0 #14241a}.divide{height:22px;width:1px;background:#a1b3a0;margin:0 7px}.keyboard{flex:1;min-height:115px;max-height:500px;position:relative;display:flex;background:#101a13;border:11px solid #273c2c;border-radius:12px;overflow:hidden;touch-action:none;box-shadow:0 6px 14px #0006,inset 0 6px 8px #0009}.white-key{position:relative;flex:1;min-width:0;background:linear-gradient(90deg,#afbdab,#f3eee0 18%,#e4e4d4 70%,#b4c0b1);border-right:2px solid #5c6b5e;box-shadow:inset 0 -12px 7px #8f9a8a;cursor:pointer}.white-key.active{background:linear-gradient(#b6d5b6,#79bd95);box-shadow:inset 0 4px 14px #31613e}.white-key:last-of-type{border-right:0}.white-key span{position:absolute;bottom:17px;left:0;right:0;text-align:center;color:#45544b;font-size:11px;font-weight:800;pointer-events:none}.black-key{position:absolute;top:0;height:62%;width:var(--key-width);left:var(--key-left);border-radius:0 0 6px 6px;background:linear-gradient(90deg,#080c0a,#25352b 20%,#1c2822 70%,#080c0a);border:1px solid #050a07;box-shadow:2px 6px 7px #0009,inset 0 -3px 2px #61756144;z-index:2;cursor:pointer}.black-key.active{background:linear-gradient(#517b61,#233c2c);box-shadow:0 3px 14px #aaffaa}.performance-pads{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:clamp(7px,1.5vw,17px);padding:clamp(2px,1vw,10px);touch-action:none}.performance-pad{background:linear-gradient(155deg,#263a2b,#15271d);border:3px solid #142419;border-bottom-width:7px;border-radius:13px;box-shadow:0 4px 3px #10241eaa,inset 0 0 0 2px #60766066;color:#e6e9cb;display:grid;place-content:center;gap:5px;font-size:clamp(15px,2vw,24px);font-weight:750;touch-action:none}.performance-pad small{font-size:10px;color:#a5be9e}.performance-pad.active{background:#739b77;color:#0b2115;box-shadow:inset 0 4px 10px #1b4e2d}.play-bottom{color:#cee0c8;opacity:.8}.footstrip{min-height:46px;display:flex;align-items:center;gap:clamp(10px,2vw,35px);padding:2px 12px;color:var(--muted);font-weight:700;letter-spacing:.07em;font-size:10px}.indicator{display:flex;align-items:center;gap:10px;white-space:nowrap}.volume-control{margin-left:auto;display:flex;align-items:center;gap:12px;white-space:nowrap}.volume-control input{width:clamp(80px,15vw,220px)}input[type=range]{accent-color:var(--phosphor);cursor:pointer}.volume-control output{min-width:34px;color:var(--phosphor)}.sound-grid{flex:1;min-height:0;display:grid;grid-template-columns:minmax(250px,.86fr) minmax(440px,1.55fr);gap:clamp(12px,2vw,26px)}.display-case,.controls-case{min-height:0;padding:clamp(12px,2vw,28px);border-radius:18px;background:linear-gradient(140deg,#617b66,#3c5948 45%,#2d4739);border:2px solid #90a992;box-shadow:inset 0 2px 1px #d2e4be44,inset 0 -7px #243c2e,0 12px 18px #0006}.display-case{display:grid;place-items:center}.display-hardware{height:min(100%,580px);aspect-ratio:1/1;max-width:100%;padding:clamp(12px,2vw,24px);background:#1e3026;border-radius:16px;border:3px solid #16271d;display:grid;grid-template-rows:24px minmax(0,1fr) 25px;gap:8px;box-shadow:inset 0 6px 12px #0006,0 3px #849d85}.display-top,.display-footer{display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:.14em;color:#aac9a9;white-space:nowrap}.display-footer span{display:flex;align-items:center;gap:7px}.display-hardware canvas,.original-screen-wrap canvas{width:100%;height:100%;min-height:0;min-width:0;object-fit:contain;background:#080e0a;border-radius:6px;border:1px solid #729074;image-rendering:pixelated;box-shadow:0 0 12px #b0ffac1a}.controls-case{display:flex;flex-direction:column;gap:12px}.controls-title{display:flex;justify-content:space-between;border-bottom:1px solid #8ba18b77;padding-bottom:9px;color:#ecf2df;font-size:10px;letter-spacing:.13em;font-weight:800}.controls-title span:last-child{color:#c4d9c1;font-weight:500}.button-bank{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}.machine-button{min-height:clamp(39px,7vh,68px);border:1px solid #1b3425;border-bottom:5px solid #11251a;border-radius:7px;background:linear-gradient(#3e5844,#243a2d);color:#ebead6;box-shadow:inset 0 2px 0 #728776,0 4px 6px #0005;font-size:11px;font-weight:800;letter-spacing:.025em}.machine-button.active,.machine-button:active{background:#94b994;color:#14281e;border-bottom-width:2px;transform:translateY(3px)}.second-title{margin-top:clamp(0px,1.6vh,12px)}.encoder-bank{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(80px,1fr));gap:8px}.encoder-module{border:1px solid #263c2d;background:#344d3e88;border-radius:10px;display:grid;justify-items:center;align-content:center;gap:8px;min-height:0;touch-action:none;user-select:none;cursor:ns-resize}.encoder-module>span{font-size:9px;letter-spacing:.1em;font-weight:800;color:#e3e9d5}.encoder{height:clamp(48px,6.5vw,85px);width:clamp(48px,6.5vw,85px);max-height:10vh;max-width:10vh;border-radius:50%;position:relative;background:conic-gradient(from 220deg,#a7cba2 0deg,#a7cba2 75deg,#2b4634 75deg,#2b4634 280deg,#17271d 280deg);border:5px solid #1a3022;box-shadow:inset 0 4px 7px #a5bea07a,0 5px 4px #142419}.encoder:before{content:"";position:absolute;inset:5px;background:radial-gradient(circle at 40% 28%,#5a6e5b,#263a2e 70%,#1a2a20);border-radius:50%;border:2px solid #768a70}.encoder:after{content:"";position:absolute;top:10%;left:calc(50% - 2px);height:21%;width:4px;border-radius:2px;background:var(--amber);transform-origin:50% 195%;transform:rotate(var(--rotation,0deg));box-shadow:0 0 4px #ffc877}.fineprint{margin:0;color:#d0dfc7;font-size:11px;line-height:1.4;opacity:.9}.original-workspace{flex:1;min-height:0;display:grid;grid-template-columns:minmax(200px,.85fr) minmax(400px,1.5fr);gap:16px}.original-left{display:flex;flex-direction:column;gap:10px}.original-screen-wrap{flex:1;min-height:0;display:grid;place-items:center;padding:10px;background:#1c3428;border:10px solid #56755d;border-radius:14px}.original-screen-wrap canvas{max-height:100%;max-width:100%;height:100%;width:auto;aspect-ratio:1}.original-right{display:flex;flex-direction:column;gap:15px;min-height:0;background:linear-gradient(#546d57,#304a3a);border:2px solid #829884;border-radius:16px;padding:15px}.original-bank{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.original-encoders{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,minmax(0,1fr));gap:6px}.original-keyboard{height:20%;min-height:58px;display:flex;background:#14221a;padding:6px;border-radius:8px;gap:2px}.original-key{flex:1;background:linear-gradient(#e1e4d8,#a3b7a3);border:1px solid #5f775f;border-radius:0 0 4px 4px;color:#253c2b;touch-action:none}.original-key.active{background:#9bd7aa}.sequence-frame{gap:16px}.seq-transport{display:flex;gap:28px;align-items:center;min-height:45px}.seq-transport input[type=number]{width:76px}.seq-transport output{color:#f1e7c8}.seq-legend{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:800;letter-spacing:.08em;margin-left:auto}.seq-legend+.seq-legend{margin-left:0}.seq-legend i{display:inline-block;height:12px;width:12px;background:var(--amber);border:1px solid #f4d6a9;border-radius:3px}.seq-legend.muted i{background:#283b2e;border-color:#a7baa4}.seq-header,.seq-row{display:grid;grid-template-columns:clamp(74px,10vw,135px) repeat(16,minmax(0,1fr));gap:clamp(3px,.55vw,10px)}.seq-header{font-size:10px;text-align:center;color:#dcebd2;letter-spacing:.04em}.seq-header span:first-child{text-align:left}.seq-grid{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:clamp(8px,2vh,22px)}.seq-row{align-items:center;flex:1;max-height:110px}.seq-track{border:none;background:#203c2d;color:#e9f3db;height:100%;border-radius:7px;font-size:11px;font-weight:800}.seq-step{height:100%;max-height:95px;min-height:25px;border:1px solid #203929;border-bottom:5px solid #132c1c;border-radius:7px;background:linear-gradient(#3b5942,#273d2e);box-shadow:inset 0 2px 1px #91af9233}.seq-step.on{background:linear-gradient(#e6c086,#b98548);border-color:#926337;box-shadow:inset 0 2px 3px #ffdcaa7a}.seq-step.current{outline:3px solid var(--phosphor);outline-offset:1px}.seq-bottom{margin-top:auto}.transport-btn,.power-button{background:linear-gradient(#d7b47c,#ad7f46);border:1px solid #ecc891;border-bottom:4px solid #7a562f;color:#213126;border-radius:9px;padding:13px 18px;font-weight:850;letter-spacing:.1em;font-size:12px}.transport-btn.running{background:linear-gradient(#a6d7a1,#6b9b75)}.boot-cover,.dialog-shade{position:fixed;inset:76px 0 0;background:#0c1710df;backdrop-filter:blur(9px);z-index:20;display:grid;place-items:center;padding:20px}.boot-panel{padding:clamp(24px,4vw,50px);border-radius:21px;border:2px solid #839c7e;background:linear-gradient(135deg,#47624b,#1d3428);box-shadow:0 24px 75px #000a;max-width:470px;text-align:center}.boot-crest{font-size:58px;color:var(--phosphor);margin-bottom:14px}.boot-panel h2{font-size:clamp(25px,3vw,40px);font-weight:500;letter-spacing:-.05em;margin:14px 0}.boot-panel p{color:#d0dfca;line-height:1.55}.boot-message{font-size:11px!important;color:#f0cd94!important}.dialog-shade{z-index:30}.help-dialog{position:relative;background:#293e30;border:2px solid #779576;padding:32px;border-radius:15px;max-width:670px;max-height:90%;overflow:auto;box-shadow:0 12px 40px #0008}.help-dialog p{font-size:13px;line-height:1.65}.close-help{float:right}
+@media(max-width:900px){.app{grid-template-rows:58px minmax(0,1fr)}.topbar{gap:10px;padding:0 9px}.brand-mark{width:31px;height:31px;font-size:20px}.brand-name{font-size:11px}.brand-name small{font-size:7px}.mainnav{gap:2px}.nav{padding:0 10px;height:40px;font-size:10px}.nav span{margin-left:2px}.header-actions{gap:4px}.small-btn{min-height:34px;padding:6px 10px;font-size:10px}.workspace{padding:9px}.panel-heading{min-height:47px}.panel-heading h1{font-size:18px}.play-frame,.sequence-frame{padding:11px}.sound-grid{grid-template-columns:minmax(195px,1fr) minmax(315px,1.45fr);gap:9px}.display-case,.controls-case{padding:10px}.boot-cover,.dialog-shade{inset:58px 0 0}.encoder-bank{gap:3px}.encoder-module{gap:3px}.encoder-module>span{font-size:8px}.encoder{width:clamp(40px,6vw,65px);height:clamp(40px,6vw,65px)}.machine-button{min-height:35px;font-size:9px}.fineprint{display:none}.original-workspace{grid-template-columns:.8fr 1.4fr}.original-right{padding:7px}}
+@media(max-width:650px) and (orientation:portrait){.brand{display:none}.mainnav{margin:0 auto}.nav{font-size:11px;padding:0 11px}.nav span{margin:0}.status-lamp{display:none}.panel-heading{flex-direction:column;align-items:flex-start;gap:8px}.panel-heading h1{font-size:17px;margin:3px 0}.head-controls{width:100%;justify-content:space-between}.mini-control{gap:5px;font-size:9px}.mini-control select{padding:6px;min-height:33px;font-size:10px}.play-frame{gap:8px}.play-tools{align-items:flex-start;min-height:35px}.play-tools .tool-cluster:first-child{display:none}.tool-cluster{gap:5px}.round-btn{min-height:36px;height:36px;min-width:37px;font-size:10px}.keyboard{border-width:6px;min-height:100px}.white-key span{font-size:9px;bottom:7px}.footstrip{flex-wrap:wrap;gap:8px;min-height:61px;padding:0 3px;font-size:8px}.volume-control{margin:0;flex:1;justify-content:flex-end}.volume-control input{width:90px}.sound-grid,.original-workspace{grid-template-columns:1fr;grid-template-rows:minmax(130px,.8fr) minmax(245px,1.6fr);gap:8px}.display-hardware{height:100%;aspect-ratio:auto;grid-template-rows:13px minmax(0,1fr) 14px;max-width:180px}.display-top,.display-footer{font-size:7px}.controls-case{gap:5px}.controls-title{font-size:8px;padding-bottom:4px}.button-bank{gap:3px}.machine-button{min-height:31px;font-size:8px;padding:2px}.encoder-bank{grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,minmax(0,1fr));gap:3px}.encoder{width:min(45px,9vw);height:min(45px,9vw);border-width:3px}.encoder-module{gap:2px}.encoder-module>span{font-size:7px}.original-left{max-height:200px}.original-right{gap:6px}.original-encoders{min-height:132px}.seq-transport{gap:8px;flex-wrap:wrap}.seq-legend{display:none}.seq-header,.seq-row{grid-template-columns:40px repeat(16,minmax(0,1fr));gap:2px}.seq-header{font-size:8px}.seq-track{font-size:8px}.seq-step{border-radius:3px;border-bottom-width:3px}.seq-grid{gap:10px}.sequence-frame{gap:10px}.seq-bottom{font-size:8px}}
+@media(max-height:500px){.workspace{padding:6px 12px}.panel-heading{min-height:35px}.panel-heading h1{display:none}.play-frame,.sequence-frame{gap:6px;padding:8px}.play-tools{min-height:30px}.round-btn{height:31px;min-width:33px}.footstrip{min-height:28px}.sound-grid{gap:8px}.display-case,.controls-case{padding:7px}.display-top,.display-footer{font-size:8px}.machine-button{min-height:28px}.encoder-bank{grid-template-rows:repeat(2,minmax(0,1fr))}.encoder{height:min(52px,10vh);width:min(52px,10vh)}.controls-case{gap:4px}.controls-title{padding-bottom:4px}.original-keyboard{min-height:35px}.seq-transport{min-height:33px}.seq-grid{gap:5px}.seq-step{min-height:20px}.boot-cover,.dialog-shade{padding:5px}}
+body.force-mobile .brand{display:none}body.force-mobile .workspace{padding:8px}body.force-mobile .sound-grid{grid-template-columns:minmax(180px,.8fr) minmax(320px,1.5fr)}body.force-desktop .brand{display:flex}
+/* 2.0.1 refinement: playing surface must not dominate the entire viewport. */
+.keyboard{flex:0 1 auto;height:clamp(175px,39dvh,350px);min-height:150px;width:100%;margin:auto 0}
+.performance-pads{flex:0 1 auto;height:clamp(210px,51dvh,430px);min-height:185px;width:min(100%,750px);margin:auto}
+@media(max-width:650px) and (orientation:portrait){
+.keyboard{height:clamp(210px,39dvh,350px);margin:auto 0}
+.performance-pads{height:min(49dvh,410px);width:100%}
+.display-hardware{max-height:210px}
+}
+@media(max-height:500px){.keyboard{height:51dvh;min-height:100px}.performance-pads{height:55dvh;min-height:100px}}
+@media(min-width:901px){.keyboard{max-width:1030px;margin:auto}.performance-pads{max-width:730px}}
+
+</style></head>
+<body>
+<div class="app" id="app">
+<header class="topbar">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">◈</span><span class="brand-name">JIANT <strong>TOUCH</strong><small>JIANT ENGINE · 4.4</small></span></div>
+  <nav class="mainnav" aria-label="Espacios de trabajo"><button class="nav active" data-view="play" aria-current="page">01 <span>INTERPRETAR</span></button><button class="nav" data-view="sound">02 <span>EDITAR</span></button><button class="nav" data-view="sequence">03 <span>SECUENCIA</span></button></nav>
+  <div class="header-actions"><div id="statusLamp" class="status-lamp" title="Audio desconectado"></div><button id="layoutButton" class="small-btn" title="Cambiar distribución">AUTO</button><button id="helpButton" class="small-btn" title="Ayuda" aria-label="Ayuda">?</button></div>
+</header>
+<div id="studioTransport" class="studio-transport" aria-label="Transporte persistente">
+ <span class="studio-brand">JIANT <b>STUDIO</b></span>
+ <button id="studioPlay" type="button">▶ BEAT</button>
+ <span id="studioBeatState" aria-live="polite">SECUENCIADOR PARADO</span>
+ <button id="studioGoSeq" type="button">◫ PATRÓN</button>
+ <button id="studioGoSound" type="button">◉ SONIDO</button>
+ <button id="studioScreenTouch" type="button" aria-pressed="true">◎ GESTOS ON</button>
+</div>
+<main class="workspace">
+<section class="view active play-view" id="play" aria-label="Interpretación">
+ <div class="panel-heading"><div><div class="eyebrow">01 / PERFORMANCE</div><h1>Un instrumento. Tu manera de tocar.</h1></div><div class="head-controls"><label class="mini-control">INTERFAZ <select id="playSurface"><option value="keys">TECLADO</option><option value="pads">PADS</option></select></label><label class="mini-control" id="keyCountWrap">REGISTRO <select id="octaves"><option value="1">1 OCTAVA</option><option value="2">2 OCTAVAS</option></select></label><button class="small-btn emphasis" id="panic">SOLTAR NOTAS</button></div></div>
+ <div class="play-frame"><div class="play-tools"><div class="tool-cluster"><span class="metal-dot"></span><span>JIANT FM ENGINE</span><span class="tinyline"></span><span id="currentRange">F3 — E4</span></div><div class="tool-cluster"><button class="round-btn" id="rangeBack" aria-label="Desplazar registro hacia graves">−</button><span>REGISTRO</span><button class="round-btn" id="rangeForward" aria-label="Desplazar registro hacia agudos">+</button><span class="divide"></span><button class="round-btn" id="octDown" title="Octava del firmware -">OCT −</button><button class="round-btn" id="octUp" title="Octava del firmware +">OCT +</button></div></div>
+   <div id="keyboard" class="keyboard" role="group" aria-label="Teclado multitáctil"></div>
+   <div id="pads" class="performance-pads" role="group" aria-label="Pads interpretativos" hidden></div>
+   <div class="play-bottom"><span>TOQUE DIRECTO · MULTITÁCTIL</span><span id="performanceTip">Ratón, pantalla táctil o MIDI</span></div>
+ </div>
+ <div class="footstrip"><div class="indicator"><i class="led alive"></i><span>MOTOR FM ORIGINAL</span></div><div class="indicator"><i class="led" id="midiLamp"></i><span id="midiText">MIDI NO CONECTADO</span></div><label class="volume-control">NIVEL MASTER <input id="volume" type="range" min="0" max="1023" value="700"><output id="volumeText">68%</output></label></div>
+</section>
+<section class="view sound-view" id="sound" aria-label="Diseño de sonido" hidden>
+ <div class="panel-heading"><div><div class="eyebrow">JIANT / TOUCH</div><h1>Pantalla original JIANT</h1></div><div class="head-controls"><button class="small-btn" id="touchFullscreen" aria-label="Ampliar pantalla JIANT">⛶ PANTALLA</button><button class="small-btn emphasis" id="touchKeyboardToggle" aria-pressed="true">⌨ TECLADO</button><button class="small-btn" id="touchPadsToggle">◫ PADS</button><button class="small-btn" id="touchOctaveToggle">2 OCT.</button><button id="originalBtn" class="small-btn emphasis" aria-pressed="false">PANTALLA GRANDE</button><button class="small-btn" data-action="HOME">HOME</button><button class="small-btn" data-action="SAVE">SAVE</button></div></div>
+ <div class="sound-grid" id="soundGrid"><div class="display-case"><div class="display-hardware"><div class="display-top"><span>JIANT · LIVE DISPLAY</span><span class="serial">ORIGINAL • 240 × 240</span></div><canvas id="firmwareScreen" width="240" height="240" aria-label="Pantalla real del firmware"></canvas><div class="display-footer"><span><i class="led alive"></i> FIRMWARE LIVE</span><span id="frameInfo">DISPLAY 01</span></div></div></div>
+ <div class="controls-case"><div class="controls-title"><span>FUNCTION / MENU</span><span>BOTONERA ORIGINAL</span></div><div class="button-bank" id="buttons"></div><div class="controls-title second-title"><span>ENCODER BANK</span><span>GIRO · RUEDA · FLECHAS</span></div><div class="encoder-bank" id="encoders"></div><p class="fineprint">Los mandos controlan los parámetros existentes del firmware. Para seleccionar una función, utiliza los botones de su menú.</p></div></div>
+ <div class="original-workspace" id="originalWorkspace" hidden><div class="original-left"><span class="eyebrow">PANEL FM1 / VISTA AMPLIADA</span><div class="original-screen-wrap"><canvas id="fullScreen" width="240" height="240" aria-label="Pantalla ampliada del FM1"></canvas></div></div><div class="original-right"><div class="original-bank" id="originalButtons"></div><div class="original-encoders" id="originalEncoders"></div><div class="original-keyboard" id="originalKeyboard"></div></div></div>
+<div class="touch-dock" id="touchDock"></div>
+</section>
+<section class="view sequence-view" id="sequence" aria-label="Secuenciador" hidden>
+ <div class="panel-heading"><div><div class="eyebrow">03 / RHYTHM LAB</div><h1>Construye el pulso.</h1></div><div class="head-controls"><button class="transport-btn" id="seqPlay">▶ REPRODUCIR</button><button class="small-btn" id="seqClear">VACIAR</button></div></div>
+ <div class="sequence-frame"><div class="seq-transport"><label class="mini-control">TEMPO <input id="tempo" type="number" min="45" max="240" value="110"></label><label class="mini-control">SWING <input id="swing" type="range" min="0" max="65" value="0"><output id="swingValue">0%</output></label><span class="seq-legend"><i></i> PASO ACTIVO</span><span class="seq-legend muted"><i></i> PASO VACÍO</span></div><div class="seq-header" id="seqHeader"></div><div class="seq-grid" id="seqGrid"></div><div class="seq-bottom"><span>16 PASOS · 4 PISTAS</span><span>PERCUSIÓN SINTETIZADA LOCALMENTE</span></div></div>
+</section>
+</main>
+<div class="boot-cover" id="boot" hidden><div class="boot-panel"><div class="boot-crest">◈</div><div class="eyebrow">JIANT / TOUCH 4.5</div><h2>Enciende la máquina.</h2><p>Motor de sonido JIANT original, teclado expresivo y secuenciador. No necesita conexión una vez cargados los archivos.</p><button id="powerButton" class="power-button">◉ INICIAR INSTRUMENTO</button><p class="boot-message" id="bootMessage">Activa el audio con un clic o una pulsación.</p></div></div>
+<div class="dialog-shade" id="helpShade" hidden><div class="help-dialog" role="dialog" aria-label="Ayuda" aria-modal="true"><button class="small-btn close-help" id="closeHelp">CERRAR ✕</button><div class="eyebrow">GUÍA / CONTROL ROOM</div><h2>Lo esencial, a mano.</h2><p><strong>TOCAR:</strong> cambia entre 1 y 2 octavas. Las flechas de registro desplazan la ventana dentro de las 27 notas del teclado del motor. Los botones OCT ± envían órdenes de octava al firmware.</p><p><strong>SONIDO:</strong> pantalla real del JIANT, botones del FM1 y encoders. Gira un encoder con arrastre vertical, rueda del ratón o flechas.</p><p><strong>PANEL COMPLETO:</strong> amplía los controles del FM1 y muestra su teclado físico virtual. No es una imagen: todos los controles están conectados al motor.</p><p><strong>SECUENCIA:</strong> 4 pistas de percusión sintetizada, independientes de las voces FM. Puedes editar sus pasos, tempo y swing.</p><p><strong>MIDI:</strong> entrada Web MIDI en Chrome/Edge. El Launchkey Mini MK4 se detecta como controlador estándar; sus funciones propietarias aún no están mapeadas.</p><p><strong>LATENCIA:</strong> utiliza auriculares con cable; Bluetooth añade retardo. El firmware incorpora un tiempo mínimo de lectura de botones.</p></div></div>
+<script>
+/* SPDX-License-Identifier: GPL-3.0-only
+   MultiSynth JIANT 2.0 — new control surface for the original Felucca/JIANT WASM firmware.
+   Derived from the open-source JIANT browser emulator (see LICENSE, README and THIRD_PARTY.md).
+*/
+(()=>{'use strict';
+const $=id=>document.getElementById(id), $$=q=>[...document.querySelectorAll(q)];
+const B={FX:0,SCL:1,ENV:2,LFO:3,EDIT:4,GLO:5,HOME:6,SAVE:7,ARP:8,SEQ:9,PLAY:10,REC:11,'OCT-':12,'OCT+':13};
+const EN={SELECT:0,ALGORITHM:1,PRESETS:2,'KNOB 1':3,'KNOB 2':4,'KNOB 3':5,'KNOB 4':6};
+const STORE='felucca-emu-flash'; // compatible with previous installed versions
+const KEY_START=53, KEY_COUNT=27, KEY_NAMES=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+const noteName=m=>KEY_NAMES[m%12]+(Math.floor(m/12)-1);
+let node=null,context=null,buttonMask=0,keyMask=0,master=700,powered=false,heldButtons=new Map(),heldKeys=new Map(),midiAccess=null,latestFB=null;
+const send=msg=>{if(node)node.port.postMessage(msg)};
+function syncButtons(){let bits=0;for(const n of heldButtons.values())bits|=1<<n;if(bits!==buttonMask){buttonMask=bits;send({type:'buttons',mask:bits})}}
+function syncKeys(){let bits=0;for(const n of heldKeys.values())bits|=1<<n;if(bits!==keyMask){keyMask=bits;send({type:'keys',mask:bits})}}
+function holdButton(bit,id){heldButtons.set(id,bit);syncButtons()}
+function releaseButton(id){if(heldButtons.delete(id))syncButtons()}
+function tapButton(name){const bit=B[name];if(bit===undefined)return;const id=Symbol(name);holdButton(bit,id);setTimeout(()=>releaseButton(id),90)}
+function holdKey(midi,id){if(midi<KEY_START||midi>=KEY_START+KEY_COUNT)return;heldKeys.set(id,midi-KEY_START);syncKeys();updateKeyHighlights()}
+function releaseKey(id){if(heldKeys.delete(id)){syncKeys();updateKeyHighlights()}}
+function releaseAll(){heldKeys.clear();heldButtons.clear();syncKeys();syncButtons();updateKeyHighlights()}
+function bindMomentary(btn,name){btn.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();btn.setPointerCapture(e.pointerId);holdButton(B[name],btn.dataset.hold=e.pointerId+'-'+name);btn.classList.add('active')});const done=()=>{releaseButton(btn.dataset.hold);btn.classList.remove('active')};['pointerup','pointercancel','lostpointercapture'].forEach(t=>btn.addEventListener(t,done));btn.addEventListener('keydown',e=>{if(e.repeat||![' ','Enter'].includes(e.key))return;holdButton(B[name],'kb'+name);btn.classList.add('active');e.preventDefault()});btn.addEventListener('keyup',e=>{if([' ','Enter'].includes(e.key)){releaseButton('kb'+name);btn.classList.remove('active')}})}
+function makeButton(name){const b=document.createElement('button');b.className='machine-button';b.textContent=name;b.type='button';b.setAttribute('aria-label','Botón FM1 '+name);bindMomentary(b,name);return b}
+function makeEncoder(name){const box=document.createElement('div');box.className='encoder-module';box.tabIndex=0;box.setAttribute('role','spinbutton');box.setAttribute('aria-label','Encoder '+name);box.setAttribute('aria-valuemin','-360');box.setAttribute('aria-valuemax','360');box.setAttribute('aria-valuenow','0');box.innerHTML=`<div class="encoder"></div><span>${name}</span>`;let drag=null,turns=0;
+ const turn=n=>{if(!powered)return;turns+=n;box.style.setProperty('--rotation',(turns*18)+'deg');box.setAttribute('aria-valuenow',String(Math.max(-360,Math.min(360,turns))));send({type:'enc',role:EN[name],n})};
+ box.addEventListener('pointerdown',e=>{e.preventDefault();box.setPointerCapture(e.pointerId);drag={y:e.clientY,residual:0}});
+ box.addEventListener('pointermove',e=>{if(!drag)return;drag.residual+=drag.y-e.clientY;drag.y=e.clientY;const n=Math.trunc(drag.residual/7);if(n){drag.residual-=n*7;turn(n)}});
+ ['pointerup','pointercancel','lostpointercapture'].forEach(t=>box.addEventListener(t,()=>drag=null));
+ box.addEventListener('wheel',e=>{e.preventDefault();turn(e.deltaY<0?1:-1)},{passive:false});
+ box.addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='ArrowRight'){turn(1);e.preventDefault()}else if(e.key==='ArrowDown'||e.key==='ArrowLeft'){turn(-1);e.preventDefault()}});
+ return box}
+const allButtons=Object.keys(B),allEncoders=Object.keys(EN);
+for(const n of allButtons){$('buttons').append(makeButton(n));$('originalButtons').append(makeButton(n))}
+for(const n of allEncoders){$('encoders').append(makeEncoder(n));$('originalEncoders').append(makeEncoder(n))}
+$$('[data-action]').forEach(b=>b.addEventListener('click',()=>tapButton(b.dataset.action)));
+// Recreate the original 27 physical FM1 contacts as an enlarged playable keyboard.
+for(let i=0;i<KEY_COUNT;i++){const b=document.createElement('button');b.className='original-key';b.textContent=(i%12===0||i===0)?noteName(KEY_START+i):'';b.setAttribute('aria-label',noteName(KEY_START+i));b.dataset.midi=KEY_START+i;$('originalKeyboard').append(b);bindPlayable(b,KEY_START+i)}
+let visibleNotes=12,baseNote=KEY_START,surface='keys';
+function playableAt(x,y){const els=document.elementsFromPoint(x,y);for(const el of els){const hit=el.closest?.('[data-midi]');if(hit&&($('keyboard').contains(hit)||$('pads').contains(hit)))return +hit.dataset.midi}return null}
+function bindPlayable(element,midi){let id=null;element.addEventListener('pointerdown',e=>{if(e.button!==0&&e.pointerType==='mouse')return;e.preventDefault();id='key'+e.pointerId+'-'+Math.random().toString(16).slice(2);element.setPointerCapture(e.pointerId);element.dataset.pointerHold=id;holdKey(midi,id)});for(const t of ['pointerup','pointercancel','lostpointercapture'])element.addEventListener(t,()=>{if(element.dataset.pointerHold){releaseKey(element.dataset.pointerHold);delete element.dataset.pointerHold}})}
+const activeMidi=()=>new Set(heldKeys.values());
+function updateKeyHighlights(){const active=activeMidi();$$('[data-midi]').forEach(b=>b.classList.toggle('active',active.has(+b.dataset.midi-KEY_START)))}
+// Only show the notes exposed by the 27-key FM1 emulation; no invented 4-octave mapping.
+function buildKeyboard(){releaseAll();const k=$('keyboard');k.replaceChildren();const whites=[];for(let n=baseNote;n<baseNote+visibleNotes;n++)if(![1,3,6,8,10].includes(n%12))whites.push(n);
+ whites.forEach(n=>{const key=document.createElement('div');key.className='white-key';key.dataset.midi=n;key.dataset.white='';key.setAttribute('aria-label',noteName(n));if(n%12===0||n===baseNote){const sp=document.createElement('span');sp.textContent=noteName(n);key.append(sp)}k.append(key)});
+ for(let i=0;i<visibleNotes;i++){const midi=baseNote+i;if(![1,3,6,8,10].includes(midi%12))continue;const position=whites.filter(w=>w<midi).length;const key=document.createElement('div');key.className='black-key';key.dataset.midi=midi;key.setAttribute('aria-label',noteName(midi));key.style.setProperty('--key-left',`calc(${100*position/whites.length}% - ${100*.31/whites.length}%)`);key.style.setProperty('--key-width',`${100*.62/whites.length}%`);k.append(key)}
+ $('currentRange').textContent=noteName(baseNote)+' — '+noteName(baseNote+visibleNotes-1);$('rangeBack').disabled=baseNote===KEY_START;$('rangeForward').disabled=baseNote+visibleNotes>=KEY_START+KEY_COUNT;
+}
+function buildPads(){releaseAll();const root=$('pads');root.replaceChildren();for(let i=0;i<16;i++){const note=KEY_START+i;const b=document.createElement('button');b.className='performance-pad';b.dataset.midi=note;b.innerHTML=`<b>${String(i+1).padStart(2,'0')}</b><small>${noteName(note)}</small>`;root.append(b);bindPlayable(b,note)}}
+const pointerKeys=new Map();$('keyboard').addEventListener('pointerdown',e=>{const note=playableAt(e.clientX,e.clientY);if(note===null)return;e.preventDefault();const id='board'+e.pointerId;pointerKeys.set(e.pointerId,note);$('keyboard').setPointerCapture(e.pointerId);holdKey(note,id)});
+$('keyboard').addEventListener('pointermove',e=>{if(!pointerKeys.has(e.pointerId))return;const next=playableAt(e.clientX,e.clientY);if(next===null||next===pointerKeys.get(e.pointerId))return;pointerKeys.set(e.pointerId,next);holdKey(next,'board'+e.pointerId)});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])$('keyboard').addEventListener(type,e=>{if(pointerKeys.delete(e.pointerId))releaseKey('board'+e.pointerId)});
+$('rangeBack').onclick=()=>{baseNote=Math.max(KEY_START,baseNote-5);buildKeyboard()};$('rangeForward').onclick=()=>{baseNote=Math.min(KEY_START+KEY_COUNT-visibleNotes,baseNote+5);buildKeyboard()};
+$('octaves').onchange=()=>{visibleNotes=+$('octaves').value*12;baseNote=Math.min(baseNote,KEY_START+KEY_COUNT-visibleNotes);buildKeyboard()};
+$('playSurface').onchange=()=>{surface=$('playSurface').value;$('keyboard').hidden=surface!=='keys';$('pads').hidden=surface!=='pads';$('keyCountWrap').hidden=surface!=='keys';releaseAll()};
+$('octDown').onclick=()=>tapButton('OCT-');$('octUp').onclick=()=>tapButton('OCT+');$('panic').onclick=releaseAll;
+buildKeyboard();buildPads();
+// Firmware's native 240×240 RGB565 framebuffer; render only when firmware sends a new frame.
+const displayCanvases=[$('firmwareScreen'),$('fullScreen')];const fctx=displayCanvases.map(c=>c.getContext('2d',{alpha:false}));const pixels=fctx[0].createImageData(240,240);
+function displayFrame(fb){latestFB=fb;const a=pixels.data;for(let i=0;i<57600;i++){const raw=fb[i],v=((raw>>8)|(raw<<8))&65535;a[4*i]=((v>>11)&31)*255/31;a[4*i+1]=((v>>5)&63)*255/63;a[4*i+2]=(v&31)*255/31;a[4*i+3]=255}fctx.forEach(c=>c.putImageData(pixels,0,0))}
+function readFlash(){try{const raw=JSON.parse(localStorage.getItem(STORE)||'{}'),out={};for(const [off,b64]of Object.entries(raw))out[off]=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));return out}catch{return {}}}
+function saveFlash(sectors){try{const out={};for(const [off,bytes] of Object.entries(sectors)){let s='';for(let i=0;i<bytes.length;i+=4096)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+4096));out[off]=btoa(s)}localStorage.setItem(STORE,JSON.stringify(out));return true}catch{return false}}
+$('volume').oninput=()=>{master=+$('volume').value;$('volumeText').textContent=Math.round(master/1023*100)+'%';send({type:'master',value:master})};
+async function powerOn(){const b=$('powerButton');if(powered)return;b.disabled=true;$('bootMessage').textContent='Inicializando motor JIANT…';try{const ac=new AudioContext({sampleRate:44100,latencyHint:'interactive'});context=ac;const [wasm]=await Promise.all([fetch('felucca.wasm',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('felucca.wasm: '+r.status);return r.arrayBuffer()}),ac.audioWorklet.addModule('worklet.js')]);node=new AudioWorkletNode(ac,'felucca',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2]});node.connect(ac.destination);
+ await new Promise((resolve,reject)=>{node.port.onmessage=e=>{const m=e.data;if(m.type==='ready'){resolve();return}if(m.type==='error'){reject(Error(m.message));return}if(m.type==='frame'){if(m.fb)displayFrame(m.fb);if(m.sectors)saveFlash(m.sectors);if(m.leds){const mask=m.leds[0]||0;$$('.machine-button').forEach(b=>{b.classList.toggle('lit',!!(mask&(1<<B[b.textContent])))})}}};node.port.postMessage({type:'load',wasm,sectors:readFlash(),master},[wasm])});
+ await ac.resume();powered=true;$('boot').hidden=true;$('statusLamp').classList.add('on');$('statusLamp').title='Audio conectado';send({type:'visible',on:true});initMidi();
+ }catch(err){node=null;context?.close().catch(()=>{});context=null;b.disabled=false;$('bootMessage').textContent='No se pudo iniciar: '+(err.message||err)+' · Usa Chrome o Edge y comprueba que los archivos están en la misma carpeta.'}}
+$('powerButton').onclick=powerOn;
+const MIDI_STORE='jiant-touch-midi-map-v2';
+let midiSettings={channel:'all',device:'all',map:{},clockDevice:'all',clockMode:'internal'};
+try{const saved=JSON.parse(localStorage.getItem(MIDI_STORE)||'null');if(saved&&typeof saved==='object')midiSettings={...midiSettings,...saved}}catch{}
+let midiLearn=null;const midiLast=new Map();let midiMonitor='Sin mensajes MIDI';
+function saveMidi(){try{localStorage.setItem(MIDI_STORE,JSON.stringify(midiSettings))}catch{}}
+function midiReceive(event){const d=event.data;if(!d?.length)return;const status=d[0],kind=status&0xf0,ch=(status&15)+1;
+ midiMonitor='Entrada: '+(event.currentTarget?.name||'MIDI')+' · '+Array.from(d).map(v=>v.toString(16).padStart(2,'0')).join(' ');const monitor=$('midiMonitor');if(monitor)monitor.textContent=midiMonitor;
+ if(status>=0xf8){receiveMidiClock(status,event);return;} // Realtime messages have no MIDI channel.
+ if(midiSettings.device!=='all'&&event.currentTarget.id!==midiSettings.device)return;
+ if(midiSettings.channel!=='all'&&ch!==Number(midiSettings.channel))return;
+ if(kind===0xb0&&d.length>=3){const cc=d[1],val=d[2];if(midiLearn){midiSettings.map[cc]=midiLearn;midiLearn=null;saveMidi();renderMidiMap();return}
+ const role=midiSettings.map[cc];if(role){if(role==='MASTER'){$('volume').value=Math.round(val*1023/127);$('volume').dispatchEvent(new Event('input'))}else if(EN[role]!==undefined){const prev=midiLast.get(cc);midiLast.set(cc,val);const mode=$('midiEncoderMode')?.value||'absolute';let diff=0;if(mode==='relative'){diff=val===64?0:val>64?val-128:val}else if(prev!==undefined){diff=Math.round((val-prev)/4)}diff=Math.max(-12,Math.min(12,diff));if(diff)send({type:'enc',role:EN[role],n:diff})}else if(B[role]!==undefined&&val>=64)tapButton(role)}return}
+ if(kind===0x90||kind===0x80||kind===0xe0||kind===0xd0||kind===0xa0||kind===0xb0||kind===0xc0)send({type:'midi',data:[status,d[1]||0,d[2]||0]});
+}
+async function initMidi(){if(!navigator.requestMIDIAccess){$('midiText').textContent='MIDI: NAVEGADOR NO COMPATIBLE';return}try{midiAccess=await navigator.requestMIDIAccess();const update=()=>{const ins=[...midiAccess.inputs.values()];$('midiLamp').classList.toggle('alive',!!ins.length);$('midiText').textContent=ins.length?('MIDI: '+ins.map(i=>i.name).join(' / ')).slice(0,60):'MIDI: CONECTA UN CONTROLADOR';for(const input of ins)input.onmidimessage=midiReceive;renderMidiMap()};midiAccess.onstatechange=update;update()}catch{$('midiText').textContent='MIDI: PERMISO DENEGADO'}}
+function renderMidiMap(){const box=$('midiMapPanel');if(!box)return;const inputs=midiAccess?[...midiAccess.inputs.values()]:[];
+ $('midiDevice').innerHTML='<option value="all">Todos los dispositivos</option>'+inputs.map(i=>'<option value="'+i.id+'">'+i.name.replaceAll('<','&lt;')+'</option>').join('');$('midiDevice').value=midiSettings.device;if($('midiDevice').selectedIndex<0){$('midiDevice').value='all';midiSettings.device='all'}
+ $('midiChannel').value=midiSettings.channel;
+ $('clockMode').value=midiSettings.clockMode;
+ $('clockDevice').innerHTML='<option value="all">Todos los dispositivos</option>'+inputs.map(i=>'<option value="'+i.id+'">'+i.name.replaceAll('<','&lt;')+'</option>').join('');$('clockDevice').value=midiSettings.clockDevice;if($('clockDevice').selectedIndex<0){$('clockDevice').value='all';midiSettings.clockDevice='all'}
+ clockUi();
+ $('midiMappings').innerHTML=Object.entries(midiSettings.map).sort((a,b)=>+a[0]- +b[0]).map(([cc,role])=>'<div class="midi-map-row"><span>CC '+cc+' → '+role+'</span><button type="button" data-remove="'+cc+'">×</button></div>').join('');
+ $('midiLearnStatus').textContent=midiLearn?'Mueve ahora un control MIDI para asignarlo a '+midiLearn:'Selecciona un destino y pulsa Aprender';
+}
+
+window.__jiantMidi={renderMidiMap,get settings(){return midiSettings},setLearn:v=>{midiLearn=v;renderMidiMap()},clear:()=>{midiSettings.map={};midiLast.clear();saveMidi();renderMidiMap()},save:saveMidi,remove:cc=>{delete midiSettings.map[cc];saveMidi();renderMidiMap()}};
+const views=['play','sound','sequence'];function showView(name){releaseAll();for(const view of views){const on=view===name;$(view).hidden=!on;$(view).classList.toggle('active',on)}$$('.nav').forEach(btn=>{const on=btn.dataset.view===name;btn.classList.toggle('active',on);on?btn.setAttribute('aria-current','page'):btn.removeAttribute('aria-current')});/* El secuenciador sigue sonando al cambiar de vista. */}
+$$('.nav').forEach(b=>b.onclick=()=>showView(b.dataset.view));
+$('originalBtn').onclick=()=>{const on=$('originalWorkspace').hidden;$('originalWorkspace').hidden=!on;$('soundGrid').hidden=on;$('originalBtn').textContent=on?'VOLVER A SÍNTESIS':'PANEL COMPLETO';$('originalBtn').setAttribute('aria-pressed',String(on))};
+let mode='auto';try{mode=localStorage.getItem('ms20-layout')||'auto'}catch{}function updateLayout(){document.body.classList.remove('force-mobile','force-desktop');if(mode!=='auto')document.body.classList.add('force-'+mode);$('layoutButton').textContent=mode.toUpperCase()};updateLayout();$('layoutButton').onclick=()=>{mode=mode==='auto'?'mobile':mode==='mobile'?'desktop':'auto';try{localStorage.setItem('ms20-layout',mode)}catch{}updateLayout()};
+$('helpButton').onclick=()=>{$('helpShade').hidden=false};$('closeHelp').onclick=()=>{$('helpShade').hidden=true};$('helpShade').onclick=e=>{if(e.target===$('helpShade'))$('helpShade').hidden=true};
+window.addEventListener('blur',releaseAll);document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseAll();send({type:'visible',on:!document.hidden})});
+// Keyboard QWERTY: A-W-S-E-D-F-T-G-Y-H-U-J-K... 1.5 octaves without consuming shortcuts.
+const qwerty=['KeyA','KeyW','KeyS','KeyE','KeyD','KeyF','KeyT','KeyG','KeyY','KeyH','KeyU','KeyJ','KeyK','KeyO','KeyL','KeyP','Semicolon'];const keycodeHeld=new Set();document.addEventListener('keydown',e=>{if(e.target.closest('input,select,button')||e.repeat)return;const i=qwerty.indexOf(e.code);if(i<0||!powered||$('play').hidden)return;e.preventDefault();keycodeHeld.add(e.code);holdKey(baseNote+i,'q'+e.code)});document.addEventListener('keyup',e=>{if(keycodeHeld.delete(e.code))releaseKey('q'+e.code)});
+// Standalone local percussion: not advertised as JIANT firmware drum sounds.
+const tracks=['BOMBO','CAJA','HI-HAT','CLAP'],pattern=Array.from({length:4},(_,r)=>Array.from({length:16},(_,c)=>r===0?c%4===0:r===1?c%8===4:r===2?c%2===0:false));
+try{const stored=JSON.parse(localStorage.getItem('ms20-pattern')||'null');if(Array.isArray(stored)&&stored.length===4)for(let r=0;r<4;r++)for(let c=0;c<16;c++)pattern[r][c]=!!stored[r]?.[c]}catch{}
+const savePattern=()=>{try{localStorage.setItem('ms20-pattern',JSON.stringify(pattern))}catch{}};
+$('seqHeader').innerHTML='<span>PISTA / PASO</span>'+Array.from({length:16},(_,i)=>`<span>${String(i+1).padStart(2,'0')}</span>`).join('');
+const cells=[];for(let r=0;r<4;r++){const row=document.createElement('div');row.className='seq-row';const label=document.createElement('button');label.className='seq-track';label.textContent=tracks[r];label.title='Escuchar '+tracks[r];label.onclick=()=>playDrum(r,context?.currentTime);row.append(label);for(let c=0;c<16;c++){const b=document.createElement('button');b.className='seq-step';b.classList.toggle('on',pattern[r][c]);b.setAttribute('aria-label',tracks[r]+' paso '+(c+1));b.setAttribute('aria-pressed',String(pattern[r][c]));b.onclick=()=>{pattern[r][c]=!pattern[r][c];b.classList.toggle('on',pattern[r][c]);b.setAttribute('aria-pressed',String(pattern[r][c]));savePattern()};row.append(b);cells.push({r,c,el:b})}$('seqGrid').append(row)}
+function noiseBuffer(ctx,len){const buf=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*len),ctx.sampleRate),data=buf.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;return buf}
+function playDrum(r,t){if(!context||context.state!=='running')return;const ac=context;const at=Math.max(ac.currentTime,t??ac.currentTime);const g=ac.createGain();g.connect(ac.destination);
+ if(r===0){const o=ac.createOscillator();o.type='sine';o.frequency.setValueAtTime(145,at);o.frequency.exponentialRampToValueAtTime(42,at+.16);g.gain.setValueAtTime(.6,at);g.gain.exponentialRampToValueAtTime(.001,at+.32);o.connect(g);o.start(at);o.stop(at+.34)}else{const duration=r===2?.07:.17;const src=ac.createBufferSource();src.buffer=noiseBuffer(ac,duration);const filter=ac.createBiquadFilter();filter.type=r===2?'highpass':'bandpass';filter.frequency.value=r===2?7500:r===1?1800:2800;filter.Q.value=.7;g.gain.setValueAtTime(r===2?.14:.25,at);g.gain.exponentialRampToValueAtTime(.001,at+duration);src.connect(filter);filter.connect(g);src.start(at);src.stop(at+duration)}}
+let running=false,seqTimer=null,nextTime=0,nextStep=0,flashTime=0;
+// External clock drives the LOCAL percussion grid, not the JIANT firmware's own sequencer.
+let clockTicks=0,clockLast=0,clockIntervals=[],clockBpm=0,clockActive=false,clockStep=0;
+function clockUi(){
+ const el=$('clockStatus');if(!el)return;
+ el.textContent=midiSettings.clockMode==='external'?'EXT · '+(clockActive?'RUN':'STOP')+(clockBpm?' · '+clockBpm+' BPM':' · esperando reloj'):'INT · tempo local';
+ $('tempo').disabled=midiSettings.clockMode==='external';$('swing').disabled=midiSettings.clockMode==='external';
+}
+window.__jiantClock={reset:()=>{clockActive=false;clockTicks=0;clockStep=0;clockBpm=0;stopSeq()},ui:clockUi};
+function receiveMidiClock(status,event){
+ if(midiSettings.clockMode!=='external')return;
+ if(midiSettings.clockDevice!=='all'&&event.currentTarget?.id!==midiSettings.clockDevice)return;
+ const now=performance.now();
+ if(status===0xfa){clockTicks=0;clockStep=0;clockActive=true;clockIntervals=[];clockLast=0;running=true;clearInterval(seqTimer);seqTimer=null;$('seqPlay').textContent='■ DETENER (EXT)';$('seqPlay').classList.add('running');clockUi();return;}
+ if(status===0xfb){clockActive=true;running=true;clearInterval(seqTimer);seqTimer=null;$('seqPlay').textContent='■ DETENER (EXT)';$('seqPlay').classList.add('running');clockUi();return;}
+ if(status===0xfc){clockActive=false;stopSeq();clockUi();return;}
+ if(status!==0xf8)return;
+ if(clockLast&&now-clockLast>0&&now-clockLast<250){clockIntervals.push(now-clockLast);if(clockIntervals.length>48)clockIntervals.shift();if(clockIntervals.length>=12){const avg=clockIntervals.reduce((a,b)=>a+b,0)/clockIntervals.length;clockBpm=Math.round(60000/(avg*24));}}
+ clockLast=now;
+ if(!clockActive)return;
+ if(clockTicks%6===0){
+  const step=clockStep%16;
+  if(context?.state==='running')for(let r=0;r<4;r++)if(pattern[r][step])playDrum(r,context.currentTime+.005);
+  showStep(step);clockStep++;
+ }
+ clockTicks++;if(clockTicks%24===0)clockUi();
+}
+function showStep(c){for(const cell of cells)cell.el.classList.toggle('current',running&&cell.c===c)}
+function scheduler(){if(midiSettings.clockMode==='external'||!running||!context)return;const bpm=Math.max(45,Math.min(240,+$('tempo').value||110)),interval=60/bpm/4,swing=+$('swing').value/100;while(nextTime<context.currentTime+.095){const step=nextStep;for(let r=0;r<4;r++)if(pattern[r][step])playDrum(r,nextTime);const remaining=Math.max(0,(nextTime-context.currentTime)*1000);setTimeout(()=>{if(running)showStep(step)},remaining);nextStep=(step+1)%16;nextTime+=interval*(step%2===0?1+swing:1-swing)}}
+function stopSeq(){running=false;clearInterval(seqTimer);seqTimer=null;$('seqPlay').textContent='▶ REPRODUCIR';$('seqPlay').classList.remove('running');showStep(-1)}
+$('seqPlay').onclick=async()=>{if(midiSettings.clockMode==='external'){ $('midiMapPanel').hidden=false;clockUi();return;}if(running){stopSeq();return}if(!powered){$('boot').hidden=false;return}await context.resume();running=true;nextStep=0;nextTime=context.currentTime+.03;seqTimer=setInterval(scheduler,25);scheduler();$('seqPlay').textContent='■ DETENER';$('seqPlay').classList.add('running')};
+$('seqClear').onclick=()=>{for(const cell of cells){pattern[cell.r][cell.c]=false;cell.el.classList.remove('on');cell.el.setAttribute('aria-pressed','false')}savePattern()};$('swing').oninput=()=>{$('swingValue').textContent=$('swing').value+'%'};
+})();
+
+</script></div>
+<style id="touch-style">
+:root{font-family:Inter,"Segoe UI",system-ui,sans-serif}
+body{background:#e8ebe2;color:#30483a}
+.app{background:#e8ebe2}
+.topbar{background:#e1e6dc;border-bottom:1px solid #b6c8b9;color:#2e4938}
+.brand-name,.nav,.topbar .small-btn{color:#30493b}
+.brand-name strong{color:#4f8565}
+.nav.active{background:#c9dbca;color:#2b5239;border-radius:12px}
+.nav{border-radius:12px}
+.workspace{background:#e8ebe2}
+.sound-view.active{display:flex!important;flex-direction:column;gap:8px;min-height:0;height:100%}
+.sound-view .panel-heading{flex:0 0 auto}
+.sound-view .panel-heading h1{color:#2d4736}
+.sound-view .eyebrow{color:#5e896d}
+.sound-grid{flex:1;min-height:0;grid-template-columns:minmax(180px,.88fr) minmax(300px,1.55fr)}
+.display-case,.controls-case{border-radius:17px;background:#f6f7ee;border:1px solid #cad5c7;box-shadow:none}
+.display-hardware{background:#263c30;border-radius:14px}
+.controls-title{color:#597b65}
+.machine-button{border-radius:9px}
+.touch-dock{flex:0 0 clamp(112px,24dvh,245px);display:flex;flex-direction:column;min-height:0;background:#f4f6ed;border:1px solid #b9cdbb;border-radius:15px;padding:7px;gap:4px}
+.touch-dock.is-hidden{display:none}
+.touch-dock .play-frame{padding:0;min-height:0;display:flex;flex-direction:column;flex:1;gap:3px;background:transparent;border:0;box-shadow:none}
+.touch-dock .play-tools{min-height:28px;flex:0 0 auto}
+.touch-dock .keyboard,.touch-dock .performance-pads{height:auto!important;min-height:0!important;flex:1 1 auto;max-width:none;margin:0;width:100%;border-width:3px}
+.touch-dock .play-bottom{display:none}
+.touch-dock .tool-cluster:first-child{display:none}
+.touch-dock .tool-cluster{font-size:10px}
+.touch-dock .round-btn{height:28px;min-height:28px;min-width:30px;font-size:10px}
+.touch-dock .play-tools{justify-content:flex-end}
+.touch-dock .keyboard .white-key span{font-size:9px}
+.sound-view .original-workspace:not([hidden]){flex:1;min-height:0}
+.sound-view .sound-grid[hidden],.sound-view .original-workspace[hidden]{display:none!important}
+.sound-view .head-controls{gap:5px}
+.sound-view .head-controls .small-btn{min-height:31px}
+.sound-view .panel-heading{min-height:36px}
+.sound-view .panel-heading h1{font-size:clamp(13px,1.7vw,21px)}
+.touch-dock .keyboard{touch-action:none}
+@media (max-width:760px) and (orientation:landscape){
+.app{grid-template-rows:37px minmax(0,1fr)!important}
+.topbar{padding:0 7px;gap:6px}.brand-mark,.brand-name small{display:none}
+.brand-name{font-size:10px}.nav{height:30px!important;font-size:9px;padding:0 7px!important}
+.nav span{margin-left:1px}.mainnav{gap:2px}
+.header-actions{gap:3px}.header-actions .small-btn{min-height:27px;padding:3px 6px;font-size:9px}
+.workspace{padding:4px!important}
+.sound-view.active{gap:4px}
+.sound-view .panel-heading{min-height:27px!important;gap:4px;flex-direction:row;align-items:center}
+.sound-view .panel-heading h1{display:none}
+.sound-view .panel-heading .eyebrow{font-size:9px}
+.sound-view .head-controls{width:auto;margin-left:auto;gap:3px}
+.sound-view .head-controls .small-btn{min-height:25px!important;padding:3px 5px!important;font-size:9px!important}
+.sound-grid{grid-template-columns:minmax(100px,.85fr) minmax(250px,1.6fr)!important;gap:5px!important}
+.display-case,.controls-case{padding:5px!important}
+.display-hardware{max-width:none;max-height:100%;aspect-ratio:1}
+.button-bank{gap:2px}
+.machine-button{min-height:24px!important;font-size:8px!important;padding:2px!important}
+.encoder-bank{gap:2px}.encoder{width:clamp(27px,6dvh,42px)!important;height:clamp(27px,6dvh,42px)!important}
+.encoder-module>span{font-size:7px}
+.controls-title{font-size:8px;padding:0}
+.touch-dock{flex-basis:clamp(76px,25dvh,125px);padding:3px;gap:1px}
+.touch-dock .play-tools{min-height:20px}
+.touch-dock .round-btn{height:20px;min-height:20px;min-width:24px;font-size:9px}
+.touch-dock .keyboard,.touch-dock .performance-pads{min-height:0!important}
+.boot-cover,.dialog-shade{inset:37px 0 0}
+}
+@media (max-width:650px) and (orientation:portrait){
+.app{grid-template-rows:49px minmax(0,1fr)!important}
+.topbar{padding:0 5px}.brand{display:none}.mainnav{margin:0}
+.nav{padding:0 8px!important;font-size:9px!important;height:34px!important}
+.header-actions .small-btn{padding:5px;font-size:9px}
+.workspace{padding:5px}
+.sound-view.active{gap:5px}
+.sound-view .panel-heading{min-height:33px;flex-direction:row;align-items:center}
+.sound-view .panel-heading h1{display:none}
+.sound-view .head-controls{width:auto;margin-left:auto;gap:3px;flex-wrap:nowrap}
+.sound-view .head-controls .small-btn{padding:5px 6px!important;min-height:28px!important;font-size:9px!important}
+.sound-grid{grid-template-columns:1fr!important;grid-template-rows:minmax(100px,.7fr) minmax(140px,1fr)!important;gap:5px!important}
+.display-case,.controls-case{padding:5px!important}
+.display-hardware{max-width:none;height:100%;aspect-ratio:1}
+.encoder{width:min(42px,9vw)!important;height:min(42px,9vw)!important}
+.machine-button{min-height:26px!important}
+.touch-dock{flex-basis:clamp(135px,26dvh,225px)}
+.touch-dock .keyboard,.touch-dock .performance-pads{min-height:0!important}
+.boot-cover,.dialog-shade{inset:49px 0 0}
+}
+</style>
+
+<script id="touch-behavior">
+(()=>{
+const $=id=>document.getElementById(id);
+const sound=$('sound'),dock=$('touchDock'),frame=document.querySelector('#play .play-frame');
+if(!sound||!dock||!frame)return;
+dock.appendChild(frame);
+const surface=$('playSurface'),keyboard=$('keyboard'),pads=$('pads');
+function setSurface(mode){
+surface.value=mode;surface.dispatchEvent(new Event('change'));
+$('touchPadsToggle').classList.toggle('emphasis',mode==='pads');
+$('touchKeyboardToggle').classList.toggle('emphasis',mode==='keys');
+}
+function showDock(show){
+dock.classList.toggle('is-hidden',!show);
+$('touchKeyboardToggle').setAttribute('aria-pressed',String(show));
+$('touchKeyboardToggle').textContent=show?'⌨ OCULTAR':'⌨ TECLADO';
+}
+$('touchKeyboardToggle').onclick=()=>{if(dock.classList.contains('is-hidden')){setSurface('keys');showDock(true)}else if(surface.value==='pads'){setSurface('keys');showDock(true)}else showDock(false)};
+$('touchPadsToggle').onclick=()=>{setSurface('pads');showDock(true)};
+$('touchOctaveToggle').onclick=()=>{$('octaves').value=$('octaves').value==='2'?'1':'2';$('octaves').dispatchEvent(new Event('change'));$('touchOctaveToggle').textContent=$('octaves').value+' OCT.'};
+document.querySelector('[data-view="play"]').addEventListener('click',()=>{setSurface('keys');showDock(true);document.querySelector('[data-view="sound"]').click()});
+document.querySelector('[data-view="sound"]').click();
+setSurface('keys');showDock(true);
+})();
+</script>
+<style id="jiant-original-graphics">
+.sound-grid{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)!important;gap:8px!important}
+.display-case{display:flex!important;align-items:center;justify-content:center;padding:5px!important;min-width:0}
+.display-hardware{width:auto!important;height:100%!important;max-height:100%!important;aspect-ratio:1!important;max-width:100%!important;min-width:0;display:grid;grid-template-rows:15px minmax(0,1fr) 15px}
+.display-hardware canvas{height:100%!important;width:100%!important;min-width:0;min-height:0;object-fit:contain;image-rendering:pixelated;touch-action:manipulation}
+.controls-case{overflow:hidden;padding:7px!important}
+.controls-title{min-height:13px!important;font-size:8px!important}
+.encoder-bank{min-height:0!important;flex:1}
+.encoder-module{min-height:0!important;justify-content:center}
+.encoder{width:min(10vh,65px)!important;height:min(10vh,65px)!important;max-height:100%}
+.touch-dock{flex-basis:clamp(90px,25dvh,220px)}
+@media(max-width:760px) and (orientation:landscape){
+.sound-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)!important}
+.display-hardware{height:100%!important;max-height:100%!important}
+.encoder{width:min(7.5vh,36px)!important;height:min(7.5vh,36px)!important}
+.controls-case{gap:2px!important}
+.button-bank{gap:2px!important}
+}
+@media(max-width:650px) and (orientation:portrait){
+.sound-grid{grid-template-columns:1fr!important;grid-template-rows:minmax(0,1.15fr) minmax(0,.85fr)!important}
+.display-hardware{height:100%!important;width:auto!important}
+.encoder{width:min(9vw,38px)!important;height:min(9vw,38px)!important}
+.touch-dock{flex-basis:clamp(125px,24dvh,210px)}
+}
+</style><style id="refinement-43">
+:root{--phosphor:#b8f4a0}
+body{overscroll-behavior:none}
+button{touch-action:manipulation}
+.sound-view .panel-heading{padding-inline:3px}
+.sound-view .display-case{background:#dce5d7!important;border-color:#b8cbb8!important}
+.sound-view .display-hardware{box-shadow:inset 0 5px 16px #0008,0 0 0 2px #76997a,0 4px 16px #203c2933!important}
+.sound-view .display-hardware canvas{image-rendering:pixelated!important}
+.sound-view .controls-case{background:linear-gradient(135deg,#f7f7ee,#e1e9dd)!important;border-color:#c1d2bf!important}
+.sound-view .controls-title{color:#31533b!important;border-color:#b7c9b4!important}
+.sound-view .controls-title span:last-child{color:#61866b!important}
+.sound-view .machine-button{background:linear-gradient(#476650,#263d2e)!important;min-height:36px}
+.sound-view .encoder-module{background:#d3dfd0!important;border-color:#b3c9b2!important}
+.sound-view .encoder-module>span{color:#36513d!important}
+.sound-view .encoder{background:conic-gradient(from 220deg,#96cfa0 0deg,#96cfa0 135deg,#496951 135deg,#496951 280deg,#223d2a 280deg)!important}
+.sound-view .fineprint{color:#45674d!important}
+.touch-dock{box-shadow:0 2px 9px #284b3020}
+.touch-dock .play-tools{color:#365a41}
+.touch-dock .round-btn{background:#335540;color:#f2f6e9}
+#touchFullscreen{background:#315f43;color:#f5fff0;border-color:#467755}
+body.jiant-focus .sound-grid{grid-template-columns:1fr!important}
+body.jiant-focus .controls-case{display:none!important}
+body.jiant-focus .display-case{padding:5px!important}
+body.jiant-focus .display-hardware{width:auto!important;max-width:100%!important}
+body.jiant-focus #touchFullscreen{background:#b3e7a4;color:#1e452b}
+@media(max-width:760px) and (orientation:landscape){
+.sound-view .head-controls .small-btn{font-size:8px!important;padding:2px 4px!important}
+.sound-view .encoder-module{gap:1px}
+.sound-view .encoder{height:min(36px,8dvh)!important;width:min(36px,8dvh)!important}
+.sound-view .button-bank{gap:3px}
+.sound-view .machine-button{min-height:22px!important}
+.sound-view .controls-case{gap:2px!important}
+}
+@media(max-width:650px) and (orientation:portrait){
+.sound-view .head-controls{flex-wrap:wrap!important;justify-content:flex-end!important}
+.sound-view .panel-heading{min-height:42px!important}
+.sound-view .eyebrow{display:none}
+.sound-view .head-controls .small-btn{font-size:8px!important}
+.sound-view .display-hardware{max-height:100%!important}
+}
+</style>
+<script id="refinement-behavior-43">
+(()=>{
+const btn=document.getElementById('touchFullscreen');if(!btn)return;
+btn.addEventListener('click',()=>{
+const on=document.body.classList.toggle('jiant-focus');
+btn.textContent=on?'⛶ CONTROLES':'⛶ PANTALLA';
+btn.setAttribute('aria-pressed',String(on));
+});
+})();
+</script>
+<style id="touch-44">
+:root{--background:#e9eee5;--panel:#f4f5eb;--light:#2e4737;--muted:#587660;--line:#c1d2c0}
+.sound-view .display-case{background:#e2eadd!important}
+.sound-view .display-hardware{background:#172c1e!important;image-rendering:pixelated}
+.sound-view .display-hardware canvas{image-rendering:pixelated!important}
+.sound-view .controls-case{background:#f4f5ed!important}
+.sound-view .touch-dock{background:#f5f7ed!important}
+.sound-view .panel-heading h1{letter-spacing:-.035em}
+.touch-dock .white-key,.touch-dock .black-key{touch-action:none;user-select:none}
+.touch-dock .keyboard{overscroll-behavior:contain}
+button:focus-visible,[role=spinbutton]:focus-visible{outline:3px solid #70a989!important;outline-offset:2px}
+@media(max-width:850px) and (orientation:landscape){
+ .sound-view .display-case{min-height:0!important}
+ .sound-view .controls-case{min-height:0!important;overflow:auto;overscroll-behavior:contain}
+ .sound-view .display-hardware{max-height:100%!important}
+ .sound-view .sound-grid{min-height:0!important}
+ .sound-view .touch-dock{min-height:74px}
+}
+@media(max-width:650px) and (orientation:portrait){
+ .sound-view .sound-grid{grid-template-rows:minmax(130px,1fr) minmax(120px,.85fr)!important}
+ .sound-view .controls-case{overflow:auto;min-height:0}
+ .sound-view .touch-dock{flex-basis:clamp(130px,26dvh,225px)}
+}
+</style><style id="preview-fix">#previewAudio{position:fixed;right:12px;bottom:12px;z-index:12;border-radius:12px;background:#c4e6ae;color:#193528;border:1px solid #638f66;padding:11px 14px;font-weight:800;box-shadow:0 4px 15px #0004}#previewAudio[hidden]{display:none!important}.preview-note{position:absolute;bottom:10px;left:10px;right:10px;text-align:center;font:11px system-ui;color:#b7d3b3;pointer-events:none}.display-hardware{position:relative}@media(max-height:450px){#previewAudio{bottom:4px;right:4px;padding:6px 9px;font-size:10px}}</style><button id="previewAudio" type="button">◉ ACTIVAR SONIDO</button>
+<script>
+(()=>{
+const btn=document.getElementById('previewAudio'),boot=document.getElementById('boot');
+btn.addEventListener('click',()=>{boot.hidden=false;});
+const power=document.getElementById('powerButton');
+power.addEventListener('click',()=>{setTimeout(()=>{if(boot.hidden)btn.hidden=true},500)});
+const canvas=document.getElementById('firmwareScreen');
+if(canvas){const ctx=canvas.getContext('2d');if(ctx){ctx.fillStyle='#08150d';ctx.fillRect(0,0,240,240);ctx.strokeStyle='#4c7856';ctx.strokeRect(8,8,224,224);ctx.fillStyle='#b5eea5';ctx.textAlign='center';ctx.font='bold 18px monospace';ctx.fillText('JIANT TOUCH',120,94);ctx.font='12px monospace';ctx.fillText('PANTALLA ORIGINAL',120,121);ctx.font='10px monospace';ctx.fillText('SE ACTIVA CON AUDIO',120,146);ctx.fillStyle='#82aa83';ctx.fillText('VISTA PREVIA',120,197)}}
+})();
+</script><style id="midi-custom-css">#midiMapPanel{position:fixed;z-index:70;inset:7% max(12px,calc((100vw - 460px)/2));background:#eff2e8;color:#253c30;border:2px solid #6d8d73;border-radius:18px;padding:16px;overflow:auto;box-shadow:0 15px 60px #0008;font:13px system-ui}#midiMapPanel[hidden]{display:none!important}#midiMapPanel h2{margin:0 0 8px;font-size:20px}#midiMapPanel select,#midiMapPanel button{background:#fff;color:#203b2b;border:1px solid #9cb6a0;border-radius:9px;padding:8px;font:inherit}#midiMapPanel label{display:grid;gap:4px;margin:9px 0}.midi-map-row{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #cbd7c8;padding:3px}.midi-map-row button{padding:3px 9px!important}#midiOpen{position:fixed;z-index:11;bottom:12px;left:12px;background:#d9e9d5;color:#25442d;border:1px solid #6b9677;border-radius:12px;padding:10px 13px;font-weight:800}#midiMapPanel .midi-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}#midiLearnStatus{font-size:12px;color:#476a50}#midiMapPanel p{line-height:1.4}.clock-panel{border:1px solid #a7c4ab;border-radius:12px;background:#e1eadd;padding:10px;margin:10px 0;display:grid;gap:5px}.clock-panel strong{letter-spacing:.09em;font-size:11px}.clock-panel small{font-size:11px;line-height:1.4;color:#47634f}#clockStatus{font-size:12px;font-weight:800;color:#245b39}</style>
+<button id="midiOpen" type="button">♫ MIDI MAP</button>
+<div id="midiMapPanel" hidden role="dialog" aria-modal="true" aria-label="Configuración MIDI"><h2>♫ MIDI / JIANT</h2><p>Launchkey Mini MK4 y Circuit Tracks · notas y controles MIDI. Conecta el controlador antes de pulsar Conectar MIDI. Para utilizar MIDI necesitas Chrome/Edge y un servidor HTTPS.</p><label>Entrada MIDI<select id="midiDevice"></select></label><label>Canal de recepción<select id="midiChannel"><option value="all">Todos los canales</option><option value="1">Canal 1</option><option value="2">Canal 2</option><option value="3">Canal 3</option><option value="4">Canal 4</option><option value="5">Canal 5</option><option value="6">Canal 6</option><option value="7">Canal 7</option><option value="8">Canal 8</option><option value="9">Canal 9</option><option value="10">Canal 10</option><option value="11">Canal 11</option><option value="12">Canal 12</option><option value="13">Canal 13</option><option value="14">Canal 14</option><option value="15">Canal 15</option><option value="16">Canal 16</option></select></label><label>Control que quieres asignar<select id="midiTarget"><option>KNOB 1</option><option>KNOB 2</option><option>KNOB 3</option><option>KNOB 4</option><option>SELECT</option><option>ALGORITHM</option><option>PRESETS</option><option>MASTER</option><option>HOME</option><option>FX</option><option>ENV</option><option>LFO</option><option>EDIT</option><option>SEQ</option><option>PLAY</option><option>REC</option></select></label><label>Tipo de encoder MIDI<select id="midiEncoderMode"><option value="absolute">Absoluto (knobs 0–127)</option><option value="relative">Relativo (incrementos)</option></select></label><div class="clock-panel"><strong>SYNC / CIRCUIT TRACKS</strong><label>Reloj del secuenciador local<select id="clockMode"><option value="internal">Interno · BPM de MultiSynth</option><option value="external">Externo · MIDI Clock (24 PPQN)</option></select></label><label>Dispositivo que envía el reloj<select id="clockDevice"><option value="all">Todos los dispositivos</option></select></label><div id="clockStatus" aria-live="polite">INT · tempo local</div><small>Start / Continue / Stop desde Circuit Tracks controlan únicamente la cuadrícula de percusión de MultiSynth. No sincronizan el secuenciador interno del firmware JIANT. El swing externo lo determina Circuit Tracks.</small></div><p id="midiMonitor" aria-live="polite">Sin mensajes MIDI</p><div class="midi-actions"><button id="midiConnect">Conectar MIDI</button><button id="midiPanic">Soltar notas</button><button id="midiLearnButton">Aprender CC</button><button id="midiClear">Borrar asignaciones</button><button id="midiClose">Cerrar</button></div><p id="midiLearnStatus"></p><div id="midiMappings"></div><p>Los controles MIDI no están asignados de fábrica: usa Aprender CC para evitar movimientos inesperados. El reloj MIDI externo sincroniza la cuadrícula local, no el secuenciador interno de JIANT.</p><p>Las notas entrantes se envían al firmware. Los CC aprendidos controlan los encoders y botones virtuales. Los encoders se interpretan como cambios de valor; la primera lectura establece la referencia.</p></div>
+<script>(()=>{const $=id=>document.getElementById(id);$('midiConnect').onclick=()=>initMidi();$('midiPanic').onclick=()=>releaseAll();$('midiOpen').onclick=()=>{$('midiMapPanel').hidden=false;window.__jiantMidi.renderMidiMap()};$('midiClose').onclick=()=>{$('midiMapPanel').hidden=true;window.__jiantMidi.setLearn(null)};$('midiDevice').onchange=e=>{window.__jiantMidi.settings.device=e.target.value;window.__jiantMidi.save()};$('midiChannel').onchange=e=>{window.__jiantMidi.settings.channel=e.target.value;window.__jiantMidi.save()};$('clockMode').onchange=e=>{window.__jiantMidi.settings.clockMode=e.target.value;window.__jiantMidi.save();window.__jiantClock.reset();window.__jiantClock.ui()};$('clockDevice').onchange=e=>{window.__jiantMidi.settings.clockDevice=e.target.value;window.__jiantMidi.save();window.__jiantClock.reset();window.__jiantClock.ui()};$('midiLearnButton').onclick=()=>{window.__jiantMidi.setLearn($('midiTarget').value)};$('midiClear').onclick=()=>{window.__jiantMidi.clear()};$('midiMappings').onclick=e=>{const cc=e.target.dataset.remove;if(cc!==undefined){window.__jiantMidi.remove(cc)}};})();</script><style id="instrument-50">
+/* V5: physical instrument composition, not a cosmetic recolor */
+:root{--background:#e9e8dc;--phosphor:#b6e4a4;--amber:#edb66e}
+.app{background:#e9e8dc!important;grid-template-rows:56px minmax(0,1fr)!important}
+.topbar{background:#e7e7d9!important;box-shadow:none!important;border-bottom:1px solid #b5c2ae!important;padding:0 16px!important}
+.brand-name{color:#233c2c!important;font-size:15px!important;letter-spacing:-.04em!important}.brand-name strong{color:#587e56!important}.brand-mark{border-radius:50%;background:#c2d5b6;color:#1c3b2a;box-shadow:none}
+.nav{height:37px!important;border-radius:20px!important;padding:0 14px!important;color:#526955!important}.nav.active{background:#345f45!important;color:#f5f6e9!important;box-shadow:none!important}
+.header-actions .small-btn{border-radius:20px!important;background:#f5f4e8!important;color:#36583e!important;border-color:#b8c7b4!important;min-height:32px!important}
+.workspace{padding:clamp(6px,1.3vh,14px) clamp(8px,1.6vw,22px)!important}
+.sound-view.active{gap:8px!important}
+.sound-view .panel-heading{min-height:37px!important;max-height:45px!important}
+.sound-view .panel-heading h1{font-size:17px!important;color:#294832!important;font-weight:750!important;display:block!important;margin:2px 0!important}
+.sound-view .eyebrow{color:#5e795f!important;letter-spacing:.14em!important}
+.sound-view .head-controls .small-btn{border-radius:18px!important;background:#e3e9da!important;color:#24412e!important;border:1px solid #b9cbb4!important}
+.sound-view .head-controls .small-btn.emphasis{background:#386b49!important;color:#fff!important}
+.sound-view .sound-grid{grid-template-columns:minmax(0,1.12fr) minmax(0,1fr)!important;gap:12px!important}
+.sound-view .display-case{background:#d5dfce!important;border:1px solid #b3c5b0!important;border-radius:27px!important;padding:clamp(8px,1.5vh,18px)!important;box-shadow:inset 0 2px #fff8,0 7px 22px #243a2718!important}
+.sound-view .display-hardware{width:auto!important;height:100%!important;aspect-ratio:1!important;max-width:100%!important;background:#1b2c21!important;border:7px solid #304b37!important;border-radius:22px!important;padding:clamp(7px,1vw,17px)!important;box-shadow:0 9px 20px #152d2470,inset 0 3px 10px #0007!important}
+.sound-view .display-hardware canvas{border-radius:7px!important;image-rendering:pixelated!important}
+.sound-view .controls-case{background:#f5f3e8!important;border:1px solid #c8cdbd!important;border-radius:27px!important;padding:clamp(8px,1.3vw,18px)!important;gap:7px!important;box-shadow:0 7px 22px #243a2714!important;overflow:hidden!important}
+.sound-view .controls-title{color:#3c5d42!important;border-color:#d4dccf!important;font-size:10px!important;padding-bottom:4px!important}
+.sound-view .controls-title span:last-child{color:#7b9380!important}
+.sound-view .button-bank{gap:5px!important}
+.sound-view .machine-button{background:#dfe7d8!important;border:1px solid #aebfae!important;border-bottom:3px solid #8ea58f!important;border-radius:12px!important;color:#294f37!important;min-height:33px!important;box-shadow:0 2px 3px #243a2711!important}
+.sound-view .encoder-bank{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:clamp(4px,.8vw,12px)!important;flex:1!important}
+.sound-view .encoder-module{background:#e8ecdf!important;border:1px solid #d1dacd!important;border-radius:18px!important;gap:7px!important;min-height:0!important;touch-action:none!important;box-shadow:inset 0 1px #fff!important}
+.sound-view .encoder-module>span{font-size:clamp(9px,.85vw,13px)!important;color:#405b42!important;letter-spacing:.04em!important}
+.sound-view .encoder{width:clamp(53px,8.5vw,112px)!important;height:clamp(53px,8.5vw,112px)!important;max-width:min(100%,18vh)!important;max-height:18vh!important;border:5px solid #3b5843!important;background:conic-gradient(from 220deg,#9fc6a1 0deg,#a5d4aa 145deg,#4c7053 145deg,#3c5843 280deg,#253a2b 280deg)!important;box-shadow:0 6px 8px #1b382a45,inset 0 2px 4px #c9f1c166!important}
+.sound-view .encoder:before{background:radial-gradient(circle at 38% 26%,#779783,#3c5c49 58%,#1c3629)!important;border:2px solid #75947a!important}
+.sound-view .encoder:after{background:#f5d28c!important}
+.sound-view .fineprint{font-size:9px!important;color:#718675!important;margin:0!important}
+.sound-view .touch-dock{background:#dbe4d4!important;border:1px solid #b7c7b2!important;border-radius:22px!important;padding:8px!important;flex-basis:clamp(110px,23dvh,220px)!important}
+.sound-view .touch-dock .keyboard{border:5px solid #405746!important;border-radius:13px!important}
+.sound-view .touch-dock .round-btn{border-radius:9px!important}
+@media (max-width:900px) and (orientation:landscape){
+.app{grid-template-rows:39px minmax(0,1fr)!important}.topbar{padding:0 6px!important}.brand{display:none!important}.nav{height:28px!important;padding:0 8px!important;font-size:9px!important}
+.sound-view .panel-heading{min-height:27px!important;max-height:30px!important}.sound-view .panel-heading h1{display:none!important}
+.sound-view .sound-grid{grid-template-columns:minmax(0,1.04fr) minmax(0,1.3fr)!important;gap:5px!important}
+.sound-view .display-case,.sound-view .controls-case{padding:4px!important;border-radius:13px!important}
+.sound-view .display-hardware{border-width:3px!important;border-radius:11px!important;padding:4px!important}
+.sound-view .controls-case{gap:2px!important}.sound-view .controls-title{font-size:7px!important;padding:0!important}.sound-view .button-bank{gap:2px!important}.sound-view .machine-button{min-height:22px!important;font-size:8px!important;border-bottom-width:2px!important;border-radius:6px!important}
+.sound-view .encoder-bank{gap:3px!important}.sound-view .encoder-module{gap:2px!important;border-radius:9px!important}.sound-view .encoder{width:min(13vh,68px)!important;height:min(13vh,68px)!important;max-height:100%!important;border-width:3px!important}.sound-view .encoder-module>span{font-size:8px!important}
+.sound-view .fineprint{display:none!important}.sound-view .touch-dock{flex-basis:clamp(72px,23dvh,120px)!important;padding:3px!important;border-radius:10px!important}
+}
+@media (max-width:650px) and (orientation:portrait){
+.app{grid-template-rows:45px minmax(0,1fr)!important}.sound-view .panel-heading h1{display:none!important}
+.sound-view .sound-grid{grid-template-columns:1fr!important;grid-template-rows:minmax(0,1.05fr) minmax(0,.95fr)!important;gap:5px!important}
+.sound-view .display-case,.sound-view .controls-case{border-radius:16px!important;padding:5px!important}
+.sound-view .display-hardware{border-width:4px!important;border-radius:12px!important;padding:5px!important}
+.sound-view .controls-case{gap:2px!important}.sound-view .controls-title{font-size:8px!important;padding:0!important}.sound-view .machine-button{min-height:23px!important;font-size:8px!important;border-radius:7px!important}
+.sound-view .encoder-bank{gap:3px!important}.sound-view .encoder-module{border-radius:9px!important;gap:2px!important}.sound-view .encoder{width:min(13vw,64px)!important;height:min(13vw,64px)!important;max-height:100%!important;border-width:3px!important}.sound-view .encoder-module>span{font-size:8px!important}.sound-view .fineprint{display:none!important}
+.sound-view .touch-dock{flex-basis:clamp(115px,23dvh,190px)!important;border-radius:14px!important;padding:4px!important}
+}
+</style><style id="studio-51">
+/* 5.1: instrumentos primero, aire entre mandos y ritmo independiente */
+.app{grid-template-rows:auto 43px minmax(0,1fr)!important}
+.studio-transport{height:43px;display:flex;align-items:center;gap:9px;padding:5px 13px;background:#203a2a;color:#e8f0df;border-bottom:1px solid #527357;min-width:0}
+.studio-brand{font-size:11px;letter-spacing:.15em;font-weight:800;white-space:nowrap}
+.studio-brand b{color:#b6dcab}
+.studio-transport button{border:1px solid #749579;border-radius:9px;background:#395a43;color:#eff6e8;font:700 11px system-ui;min-height:31px;padding:4px 13px;white-space:nowrap;cursor:pointer}
+.studio-transport button.playing{background:#c2e7a8;color:#1b3d29}
+#studioBeatState{font:700 10px system-ui;letter-spacing:.09em;color:#c4d9c2;flex:1;min-width:0}
+.sound-view .encoder-bank{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;gap:clamp(9px,1.5vw,20px)!important;padding:clamp(8px,1vw,15px)!important;align-items:stretch}
+.sound-view .encoder-module{border-radius:20px!important;padding:6px!important;background:#e6ebdd!important;border:1px solid #bdcdb9!important;display:flex!important;flex-direction:column;justify-content:center!important;gap:6px!important}
+.sound-view .encoder{width:clamp(55px,min(8vw,12vh),108px)!important;height:clamp(55px,min(8vw,12vh),108px)!important;max-width:100%!important;max-height:100%!important;flex-shrink:1}
+.sound-view .encoder-module>span{font-size:clamp(10px,.8vw,13px)!important;letter-spacing:.06em}
+.sound-view .controls-case{overflow:auto;min-height:0}
+.sound-view .display-hardware{position:relative;overflow:hidden}
+.jiant-touch-hints{position:absolute;inset:0;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;padding:4px}
+.jiant-touch-hints span{background:#122b1dcc;color:#d6f4ce;border:1px solid #6f9b77;border-radius:7px;font:700 9px system-ui;padding:4px 7px;max-width:100%;text-align:center}
+.display-hardware.gestures-off .jiant-touch-hints{display:none}
+.display-hardware.gestures-on canvas{touch-action:none!important;cursor:grab}
+@media(max-width:800px){
+.studio-transport{height:36px;padding:3px 5px;gap:4px}
+.studio-brand{display:none}
+.studio-transport button{font-size:9px;padding:3px 7px;min-height:27px}
+#studioBeatState{font-size:9px}
+.app{grid-template-rows:auto 36px minmax(0,1fr)!important}
+.sound-view .encoder-bank{gap:5px!important;padding:3px!important}
+.sound-view .encoder-module{border-radius:10px!important;padding:2px!important;gap:2px!important}
+.sound-view .encoder{width:clamp(30px,8vh,62px)!important;height:clamp(30px,8vh,62px)!important}
+.sound-view .encoder-module>span{font-size:8px!important}
+.sound-view .controls-case{overflow:auto}
+}
+@media(max-width:650px) and (orientation:portrait){
+.sound-view .encoder-bank{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important}
+.sound-view .encoder{width:min(13vw,62px)!important;height:min(13vw,62px)!important}
+}
+</style><script id="studio-51-logic">
+(()=>{
+const $=id=>document.getElementById(id);
+const play=$('studioPlay'),state=$('studioBeatState'),seq=$('seqPlay');
+const refresh=()=>{
+ const active=seq.classList.contains('running');
+ play.classList.toggle('playing',active);
+ play.textContent=active?'■ DETENER BEAT':'▶ BEAT';
+ state.textContent=active?'● BEAT SONANDO · EDICIÓN LIBRE':'SECUENCIADOR PARADO';
+};
+play.addEventListener('click',()=>{seq.click();setTimeout(refresh,50);setTimeout(refresh,400)});
+new MutationObserver(refresh).observe(seq,{attributes:true,attributeFilter:['class']});
+$('studioGoSeq').addEventListener('click',()=>document.querySelector('[data-view="sequence"]').click());
+$('studioGoSound').addEventListener('click',()=>document.querySelector('[data-view="sound"]').click());
+const gestureButton=$('studioScreenTouch');
+const canvas=$('display')||document.querySelector('.display-hardware canvas');
+const frame=canvas?.closest('.display-hardware');
+if(frame&&canvas){
+ frame.classList.add('gestures-on');
+ const hint=document.createElement('div');hint.className='jiant-touch-hints';
+ hint.innerHTML='<span>DESLIZA ↕: SELECT · ↔: PRESETS · DOBLE TOQUE: HOME</span>';
+ frame.append(hint);
+ let active=true,down=null,lastTap=0;
+ gestureButton.onclick=()=>{
+ active=!active;frame.classList.toggle('gestures-on',active);frame.classList.toggle('gestures-off',!active);
+ gestureButton.setAttribute('aria-pressed',String(active));gestureButton.textContent=active?'◎ GESTOS ON':'◎ GESTOS OFF';
+ };
+ canvas.addEventListener('pointerdown',e=>{if(!active)return;down={x:e.clientX,y:e.clientY};try{canvas.setPointerCapture(e.pointerId)}catch(_){}});
+ canvas.addEventListener('pointerup',e=>{
+ if(!active||!down)return;
+ const dx=e.clientX-down.x,dy=e.clientY-down.y;down=null;
+ if(Math.max(Math.abs(dx),Math.abs(dy))>18){
+ const name=Math.abs(dx)>Math.abs(dy)?'PRESETS':'SELECT';
+ const target=[...document.querySelectorAll('#encoders .encoder-module')].find(x=>x.textContent.trim()===name);
+ if(target){
+ const count=Math.min(12,Math.max(1,Math.round(Math.max(Math.abs(dx),Math.abs(dy))/24)));
+ const sign=(Math.abs(dx)>Math.abs(dy)?dx:-dy)>0?1:-1;
+ for(let i=0;i<count;i++)target.dispatchEvent(new WheelEvent('wheel',{deltaY:sign>0?-1:1,bubbles:true,cancelable:true}));
+ }
+ }else{
+ const now=performance.now();
+ if(now-lastTap<320){const home=document.querySelector('#buttons [data-action="HOME"]');home?.click();lastTap=0}
+ else lastTap=now;
+ }
+ });
+}
+refresh();
+})();
+</script></body></html>
