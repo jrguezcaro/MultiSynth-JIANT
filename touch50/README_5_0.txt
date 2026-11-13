@@ -1,0 +1,1 @@
+Versión 5.0: cambio real de diseño: knobs mayores, panel físico, pantalla firmware conservada. Para sonido se requieren felucca.wasm y worklet.js; si faltan, no hay audio. Abrir por HTTPS. Prueba visual pendiente en hardware.
