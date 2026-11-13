@@ -1,0 +1,1 @@
+JIANT Touch 4.6: index.html requiere servidor HTTPS y archivos WASM/worklet para sonido. galeria-original.html es autónoma y muestra 20 capturas ORIGINALES del repositorio JIANT; no es emulación ni captura en vivo.
